@@ -3,7 +3,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/server.ts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "knex": "node --import tsx node_modules/knex/bin/cli.js --knexfile src/common/knex/knexfile.ts"
   },
   "dependencies": {
     "dotenv": "^18.0.3",
