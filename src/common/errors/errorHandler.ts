@@ -1,6 +1,9 @@
-const logger = require('../logger/logger');
+import logger from '../logger/logger.js';
+import AppError from './AppError.js';
+import type { Request, Response, NextFunction } from 'express';
 
-module.exports = (err, req, res, next) => {
+
+export function errorHandler(err: AppError, req: Request, res: Response, next: NextFunction) {
     const operational = err.isOperational;
 
     logger.error(err.message, {
