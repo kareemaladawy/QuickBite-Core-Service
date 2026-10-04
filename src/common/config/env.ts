@@ -17,8 +17,8 @@ const schema = z.object({
     BCRYPT_SALT: z.string().default("10"),
     ACCESS_SECRET: z.string(),
     REFRESH_SECRET: z.string(),
-    ACCESS_EXPIRES_IN: z.string().default("1h"),
-    REFRESH_EXPIRES_IN: z.string().default("7d"),
+    ACCESS_EXPIRES_IN: z.string().default("3600"),
+    REFRESH_EXPIRES_IN: z.string().default("60480"),
 })
 
 const parsed = schema.parse(process.env);
@@ -39,7 +39,7 @@ export const env = {
     jwt: {
         accessSecret: parsed.ACCESS_SECRET,
         refreshSecret: parsed.REFRESH_SECRET,
-        accessExpiresIn: parsed.ACCESS_EXPIRES_IN,
-        refreshExpiresIn: parsed.REFRESH_EXPIRES_IN,
+        accessExpiresIn: Number(parsed.ACCESS_EXPIRES_IN),
+        refreshExpiresIn: Number(parsed.REFRESH_EXPIRES_IN),
     }
 }

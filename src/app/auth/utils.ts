@@ -12,6 +12,10 @@ export async function hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, env.bcryptSalt);
 }
 
+export async function comparePasswordHash(passwordInput: string, passwordHash: string): Promise<boolean> {
+    return bcrypt.compare(passwordInput, passwordHash);
+}
+
 export function generateAccessToken(payload: JwtPayload): string {
     const options: SignOptions = {
         expiresIn: env.jwt.accessExpiresIn

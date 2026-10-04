@@ -1,10 +1,10 @@
 import { User } from "../../user/entity/user.entity";
 import { SystemRole } from "../../user/enums";
-import { UserAlreadyExistsError } from "../../user/errors";
-import { createUser, userExistsByEmailOrPhone } from "../../user/repository/user.repo";
-import { RegisterDTO } from "../dto/auth.dto";
+import { IncorrectLoginCredentials, UserAlreadyExistsError, UserNotFoundError } from "../../user/errors";
+import { createUser, findUserByEmail, userExistsByEmailOrPhone } from "../../user/repository/user.repo";
+import { LoginDTO, RegisterDTO } from "../dto/auth.dto";
 import { SystemAdminCannotRegisterError } from "../errors";
-import { generateAccessToken, generateRefreshToken, hashPassword } from "../utils";
+import { comparePasswordHash, generateAccessToken, generateRefreshToken, hashPassword } from "../utils";
 
 export class AuthService {
     register: any = async (data: RegisterDTO) => {
@@ -27,6 +27,41 @@ export class AuthService {
             passwordHash: passwordHash,
             systemRole: data.role
         }));
+
+        const payload = {
+            userId: user.id,
+            email: user.email,
+            role: user.systemRole
+        };
+
+        const accessToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
+
+        return {
+            accessToken,
+            refreshToken,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.systemRole,
+            }
+        };
+    }
+
+    login: any = async (data: LoginDTO) => {
+        const user = await findUserByEmail(data.email);
+
+        if (!user) {
+            throw IncorrectLoginCredentials;
+        }
+
+        const correctPassword = await comparePasswordHash(data.password, user.passwordHash);
+
+        if (!correctPassword) {
+            throw IncorrectLoginCredentials;
+        }
 
         const payload = {
             userId: user.id,
