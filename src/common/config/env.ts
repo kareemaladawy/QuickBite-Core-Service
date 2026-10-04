@@ -2,8 +2,7 @@ import { config } from "dotenv";
 import path from "path";
 import { z } from "zod";
 
-// always resolve the .env correctly regardless of what tool uses this file
-config({ path: path.resolve(import.meta.dirname, '../../../.env') });
+config({ path: path.resolve(__dirname, '../../../.env') });
 
 const schema = z.object({
     PORT: z.string().default("3000"),
@@ -15,12 +14,18 @@ const schema = z.object({
     DB_MAX_POOL: z.string().default("10"),
     DB_MIGRATIONS_DIR: z.string(),
     DB_MIGRATIONS_EXTENTION: z.string(),
+    BCRYPT_SALT: z.string().default("10"),
+    ACCESS_SECRET: z.string(),
+    REFRESH_SECRET: z.string(),
+    ACCESS_EXPIRES_IN: z.string().default("1h"),
+    REFRESH_EXPIRES_IN: z.string().default("7d"),
 })
 
 const parsed = schema.parse(process.env);
 
 export const env = {
     port: Number(parsed.PORT),
+    bcryptSalt: Number(parsed.BCRYPT_SALT),
     db: {
         host: parsed.DB_HOST,
         port: Number(parsed.DB_PORT),
@@ -28,8 +33,13 @@ export const env = {
         password: parsed.DB_PASSWORD,
         name: parsed.DB_NAME,
         poolMax: Number(parsed.DB_MAX_POOL),
-        // F:\workspace\quickbite\core-service\src\migrations
-        migrationsDir: path.resolve(import.meta.dirname, '../../../', parsed.DB_MIGRATIONS_DIR),
+        migrationsDir: path.resolve(__dirname, '../../../', parsed.DB_MIGRATIONS_DIR),
         migrationsExt: parsed.DB_MIGRATIONS_EXTENTION,
+    },
+    jwt: {
+        accessSecret: parsed.ACCESS_SECRET,
+        refreshSecret: parsed.REFRESH_SECRET,
+        accessExpiresIn: parsed.ACCESS_EXPIRES_IN,
+        refreshExpiresIn: parsed.REFRESH_EXPIRES_IN,
     }
 }

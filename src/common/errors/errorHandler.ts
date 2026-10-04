@@ -16,11 +16,10 @@ export function errorHandler(err: AppError, req: Request, res: Response, next: N
     if (operational) {
         return res.status(err.statusCode).json({
             error: err.message,
-
         });
     }
 
     return res.status(500).json({
-        error: 'Internal server error',
+        error: 'An internal server error occured. Please try again later',
     });
 }
