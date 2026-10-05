@@ -14,7 +14,7 @@ class Logger {
             level,
             message,
             timestamp: new Date().toISOString(),
-            // ...metaData
+            ...metaData
         }
 
         console.log(JSON.stringify(logObj));

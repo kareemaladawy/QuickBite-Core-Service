@@ -1,4 +1,5 @@
 import { db } from "../../../common/knex/knex";
+import { hashPassword } from "../../auth/utils";
 import { User } from "../entity/user.entity";
 
 const userColumns = [
@@ -36,10 +37,23 @@ export async function userExistsByEmailOrPhone(email: string, phone: string): Pr
     return result.rows[0].exists;
 }
 
-export async function findUserByEmail(email: string): Promise<User | undefined> {
-    const row = await db("users").select(...userColumns).where({ email }).first();
+export async function userExistsByEmail(email: string): Promise<boolean> {
+    const result = await db.raw(`select exists (select 1 from users where email = ?) as "exists"`, [
+        email,
+    ]);
 
-    console.log(row);
+    return result.rows[0].exists;
+}
+
+export async function findUserByEmail(email: string): Promise<User | undefined> {
+    const row = await db("users").select(...userColumns).where({ email: email }).first();
+
+    return row ? toEntity(row) : undefined;
+}
+
+export async function findUserById(id: number): Promise<User | undefined> {
+    const row = await db("users").select(...userColumns).where({ id: id }).first();
+
     return row ? toEntity(row) : undefined;
 }
 
@@ -55,6 +69,15 @@ export async function createUser(user: User): Promise<User> {
         updated_at: now,
     }).returning(userColumns);
 
-    console.log(row);
     return toEntity(row);
+}
+
+export async function updateUserPassword(id: number, password: string): Promise<void> {
+    await db("users").where("id", id).update({
+        password_hash: await hashPassword(password)
+    });
+}
+
+export async function updateUserProfile(id: number, data: Object): Promise<void> {
+    await db("users").where("id", id).update(data);
 }

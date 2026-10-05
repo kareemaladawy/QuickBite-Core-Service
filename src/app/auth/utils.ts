@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import { env } from "../../common/config/env";
 import jwt, { SignOptions } from "jsonwebtoken";
 
@@ -30,4 +31,20 @@ export function generateRefreshToken(payload: JwtPayload): string {
     };
 
     return jwt.sign(payload, env.jwt.refreshSecret, options);
+}
+
+export function verifyAccessToken(token: string): JwtPayload {
+    return jwt.verify(token, env.jwt.accessSecret) as JwtPayload;
+}
+
+export function verifyRefreshToken(token: string): JwtPayload {
+    return jwt.verify(token, env.jwt.refreshSecret) as JwtPayload;
+}
+
+export async function generateOTP(): Promise<string> {
+    return crypto.randomInt(1000, 9999).toString();
+}
+
+export async function hashOTP(otp: string): Promise<string> {
+    return crypto.createHash("sha256").update(otp).digest("hex");
 }

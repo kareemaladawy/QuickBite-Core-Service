@@ -19,6 +19,8 @@ const schema = z.object({
     REFRESH_SECRET: z.string(),
     ACCESS_EXPIRES_IN: z.string().default("3600"),
     REFRESH_EXPIRES_IN: z.string().default("60480"),
+    NODE_ENV: z.enum(['local', 'development', 'production']),
+    ACCESS_EXPIRES_IN_MS: z.string().default("3600000")
 })
 
 const parsed = schema.parse(process.env);
@@ -26,6 +28,8 @@ const parsed = schema.parse(process.env);
 export const env = {
     port: Number(parsed.PORT),
     bcryptSalt: Number(parsed.BCRYPT_SALT),
+    nodeEnv: parsed.NODE_ENV,
+    accessExpiresInMs: parsed.ACCESS_EXPIRES_IN_MS,
     db: {
         host: parsed.DB_HOST,
         port: Number(parsed.DB_PORT),

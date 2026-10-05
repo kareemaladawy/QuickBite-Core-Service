@@ -11,9 +11,3 @@ export const UserNotFoundError = new AppError(
     404,
     true
 );
-
-export const IncorrectLoginCredentials = new AppError(
-    "Incorrect email or password",
-    401,
-    true
-);

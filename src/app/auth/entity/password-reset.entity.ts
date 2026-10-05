@@ -3,15 +3,15 @@ export class PasswordReset {
     userId: number;
     otpHash: string;
     expiresAt: Date;
-    createdAt: Date;
-    consumedAt: Date | null;
+    createdAt?: Date;
+    consumedAt?: Date | null;
 
     constructor(data: Partial<PasswordReset>) {
         this.id = data.id!;
         this.userId = data.userId!;
         this.otpHash = data.otpHash!;
         this.expiresAt = data.expiresAt!;
-        this.createdAt = data.createdAt ?? new Date();
+        this.createdAt = data.createdAt!;
         this.consumedAt = data.consumedAt ?? null;
     }
 

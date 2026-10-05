@@ -2,11 +2,13 @@ import express from 'express';
 import { routes } from './routes.js';
 import { errorHandler } from './common/errors/errorHandler.js';
 import { correlationId } from './common/correlation/correlationId.js';
+import cookieParser from 'cookie-parser';
 
 export function createApp() {
     const app = express();
 
     app.use(express.json());
+    app.use(cookieParser());
     app.use(correlationId);
     app.use('/api/v1', routes);
     app.use(errorHandler);
