@@ -78,6 +78,11 @@ export async function updateUserPassword(id: number, password: string): Promise<
     });
 }
 
-export async function updateUserProfile(id: number, data: Object): Promise<void> {
-    await db("users").where("id", id).update(data);
+export async function updateUserProfile(id: number, data: Object): Promise<User> {
+    const [row] = await db("users").where("id", id).update({
+        ...data,
+        updated_at: new Date()
+    }).returning(userColumns);
+
+    return toEntity(row);
 }

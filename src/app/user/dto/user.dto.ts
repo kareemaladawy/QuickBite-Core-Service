@@ -1,14 +1,14 @@
 import { IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 
 export class UpdateProfileDTO {
+    @IsOptional()
     @IsString()
     @MinLength(1)
-    @IsOptional()
-    name!: string;
+    name?: string;
 
+    @IsOptional()
     @IsString()
     @MinLength(10)
     @MaxLength(11)
-    @IsOptional()
-    phone!: string;
+    phone?: string;
 }

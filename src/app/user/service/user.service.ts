@@ -25,16 +25,14 @@ export class UserService {
             throw UserNotFoundError;
         }
 
-        await updateUserProfile(id, data);
-
-        const updatedUser = await findUserById(id);
+        const updatedUser = await updateUserProfile(id, data);
 
         return {
-            id: updatedUser!.id,
-            name: updatedUser!.name,
-            email: updatedUser!.email,
-            phone: updatedUser!.phone,
-            role: updatedUser!.systemRole,
+            id: updatedUser.id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            phone: updatedUser.phone,
+            role: updatedUser.systemRole,
         }
     }
 }
