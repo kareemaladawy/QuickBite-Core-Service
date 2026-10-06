@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import { CustomerAddressService } from "../service/customer-address.service";
-import { createCustomerAddress } from "../repository/customer-address.repo";
 import { validateBody } from "../../../common/validation/validate";
 import { CreateCustomerAddressDto, UpdateCustomerAddressDto } from "../dto/customer-address.dto";
 
