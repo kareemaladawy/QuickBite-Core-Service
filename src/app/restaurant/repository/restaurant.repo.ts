@@ -44,7 +44,7 @@ export async function getRestaurants(): Promise<Restaurant[]> {
     return rows.map(toEntity);
 }
 
-export async function getRestaurantById(id: number): Promise<Restaurant | undefined> {
+export async function findRestaurantById(id: number): Promise<Restaurant | undefined> {
     const row = await db("restaurants").select(restaurantColumns).where("id", id).first();
 
     return row ? toEntity(row) : undefined;

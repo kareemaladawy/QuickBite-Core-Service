@@ -60,7 +60,7 @@ export class BranchController {
             const userId = Number(req.user?.userId);
             const userRole = req.user?.role as SystemRole;
             const restaurantId = Number(req.params.restaurantId);
-            const restaurant = await this.restaurantService.getRestaurantById(restaurantId);
+            const restaurant = await this.restaurantService.findRestaurantById(restaurantId);
 
             if (!(userRole == SystemRole.RESTAURANT_USER && userId == restaurant.ownerId
                 || userRole == SystemRole.SYSTEM_ADMIN)
@@ -83,7 +83,7 @@ export class BranchController {
             const userRole = req.user?.role as SystemRole;
             const branchId = Number(req.params.branchId);
             const branch = await this.branchService.findBranchById(branchId);
-            const restaurant = await this.restaurantService.getRestaurantById(branch.restaurantId);
+            const restaurant = await this.restaurantService.findRestaurantById(branch.restaurantId);
 
             if (!(userRole == SystemRole.RESTAURANT_USER && userId == restaurant.ownerId
                 || userRole == SystemRole.SYSTEM_ADMIN)

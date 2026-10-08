@@ -20,10 +20,10 @@ export class RestaurantController {
         }
     }
 
-    getRestaurantById = async (req: Request, res: Response, next: NextFunction) => {
+    findRestaurantById = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const restaurantId = Number(req.params.id);
-            const restaurant = await this.restaurantService.getRestaurantById(restaurantId);
+            const restaurant = await this.restaurantService.findRestaurantById(restaurantId);
 
             return res.status(200).json({
                 data: restaurant,
@@ -62,7 +62,7 @@ export class RestaurantController {
             const userId = req.user?.userId as number;
             const userRole = req.user?.role as string;
             const restaurantId = parseInt(req.params.id as SystemRole);
-            const restaurant = await this.restaurantService.getRestaurantById(restaurantId);
+            const restaurant = await this.restaurantService.findRestaurantById(restaurantId);
 
             if (!(userRole == SystemRole.RESTAURANT_USER && userId == restaurant.ownerId
                 || userRole == SystemRole.SYSTEM_ADMIN)

@@ -2,7 +2,7 @@ import { Knex } from "knex";
 import { RegisterRestaurantDTO } from "../../auth/dto/auth.dto";
 import { Restaurant } from "../entity/restaurant.entity";
 import { RestaurantStatus } from "../enums";
-import { createRestaurant, getRestaurantById, getRestaurants, updateRestaurant, updateRestaurantStatus } from "../repository/restaurant.repo";
+import { createRestaurant, findRestaurantById, getRestaurants, updateRestaurant, updateRestaurantStatus } from "../repository/restaurant.repo";
 import { RestaurantNotFoundError } from "../errors";
 import { UpdateRestaurantDto } from "../dto/restaurant.dto";
 
@@ -13,8 +13,8 @@ export class RestaurantService {
         return restaurants;
     }
 
-    getRestaurantById = async (id: number) => {
-        const restaurant = await getRestaurantById(id);
+    findRestaurantById = async (id: number) => {
+        const restaurant = await findRestaurantById(id);
 
         if (!restaurant) {
             throw RestaurantNotFoundError;
