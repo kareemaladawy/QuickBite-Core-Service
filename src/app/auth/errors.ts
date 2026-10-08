@@ -23,3 +23,9 @@ export const IncorrectOTP = new AppError(
     401,
     true
 );
+
+export const RestaurantDataRequiredError = new AppError(
+    "Restaurant data is required",
+    400,
+    true
+);

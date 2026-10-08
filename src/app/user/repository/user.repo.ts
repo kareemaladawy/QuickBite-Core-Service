@@ -1,3 +1,4 @@
+import { Knex } from "knex";
 import { db } from "../../../common/knex/knex";
 import { hashPassword } from "../../auth/utils";
 import { User } from "../entity/user.entity";
@@ -57,9 +58,9 @@ export async function findUserById(id: number): Promise<User | undefined> {
     return row ? toEntity(row) : undefined;
 }
 
-export async function createUser(user: User): Promise<User> {
+export async function createUser(user: User, transaction: Knex = db): Promise<User> {
     const now = new Date();
-    const [row] = await db("users").insert({
+    const [row] = await transaction("users").insert({
         name: user.name,
         email: user.email,
         phone: user.phone,

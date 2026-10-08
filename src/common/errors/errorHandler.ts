@@ -3,18 +3,19 @@ import AppError from './AppError.js';
 import type { Request, Response, NextFunction } from 'express';
 
 
-export function errorHandler(err: AppError, req: Request, res: Response, next: NextFunction) {
-    const operational = err.isOperational;
+export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
+    const statusCode = err.statusCode ?? err.status;
+    const operational = err.isOperational || (typeof statusCode === 'number' && statusCode >= 400 && statusCode < 500);
 
     logger.error(err.message, {
-        statusCode: err.statusCode,
+        statusCode,
         stack: err.stack,
         operational: operational,
         correlationId: req.correlationId
     });
 
     if (operational) {
-        return res.status(err.statusCode).json({
+        return res.status(statusCode ?? 400).json({
             error: err.message,
         });
     }

@@ -1,0 +1,71 @@
+import { CreateBranchDTO, UpdateBranchDetailsDTO, UpdateBranchStatusDTO } from "../dto/branch.dto";
+import { Branch } from "../entity/branch.entity";
+import { BranchNotFoundError } from "../errors";
+import { createBranch, findBranchById, findNearbyBranches, listBranchesByRestaurantId, updateBranchDetails, updateBranchStatus } from "../repository/branch.repo";
+
+export class BranchService {
+    createBranch: any = async (restaurantId: number, data: CreateBranchDTO): Promise<Branch> => {
+        const now = new Date();
+        const branch = await createBranch(new Branch({
+            restaurantId: restaurantId,
+            label: data.label,
+            addressText: data.addressText,
+            countryCode: data.countryCode,
+            currency: data.currency,
+            deliveryRadius: data.deliveryRadius,
+            lat: data.lat,
+            long: data.long,
+            opensAt: data.opensAt,
+            closesAt: data.closesAt,
+            acceptsOrders: true,
+            isActive: false,
+            createdAt: now,
+            updatedAt: now,
+        }));
+
+        return branch;
+    }
+
+    updateBranchDetails: any = async (branchId: number, data: UpdateBranchDetailsDTO): Promise<void> => {
+        await updateBranchDetails(branchId, {
+            label: data.label,
+            addressText: data.addressText,
+            currency: data.currency,
+            deliveryRadius: data.deliveryRadius,
+            opensAt: data.opensAt,
+            closesAt: data.closesAt,
+            acceptsOrders: data.acceptsOrders,
+        });
+    }
+
+    updateBranchStatus: any = async (branchId: number, data: UpdateBranchStatusDTO): Promise<void> => {
+        await updateBranchStatus(branchId, {
+            isActive: data.isActive,
+            commissionPercentage: data.commissionPercentage
+        });
+    }
+
+    findNearbyBranches: any = async (lat: number, long: number): Promise<Branch[]> => {
+        const branches = await findNearbyBranches(lat, long);
+
+        return branches;
+    }
+
+    listBranchesByRestaurantId: any = async (restaurantId: number): Promise<Branch[]> => {
+        const branches = await listBranchesByRestaurantId(restaurantId);
+
+        return branches;
+    }
+
+    findBranchById: any = async (id: number): Promise<Branch> => {
+        const branch = await findBranchById(id);
+
+        if (!branch) {
+            throw BranchNotFoundError;
+        }
+
+        return branch;
+    }
+}
+
+export const branchService = new BranchService();

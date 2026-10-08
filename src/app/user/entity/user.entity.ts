@@ -18,8 +18,8 @@ export class User {
         this.phone = data.phone!;
         this.passwordHash = data.passwordHash!;
         this.systemRole = data.systemRole!;
-        this.createdAt = data.createdAt ?? new Date();
-        this.updatedAt = data.updatedAt ?? new Date();
+        this.createdAt = data.createdAt!;
+        this.updatedAt = data.updatedAt!;
         this.deletedAt = data.deletedAt ?? null;
     }
 

@@ -1,17 +1,21 @@
-import { validateBody } from "../../../common/validation/validate";
 import { User } from "../../user/entity/user.entity";
 import { SystemRole } from "../../user/enums";
-import { UserAlreadyExistsError, UserNotFoundError } from "../../user/errors";
-import { createUser, findUserByEmail, findUserById, updateUserPassword, userExistsByEmail, userExistsByEmailOrPhone } from "../../user/repository/user.repo";
+import { UserAlreadyExistsError } from "../../user/errors";
+import { createUser, findUserByEmail, findUserById, updateUserPassword, userExistsByEmailOrPhone } from "../../user/repository/user.repo";
 import { ForgetPasswordDTO, LoginDTO, RegisterDTO, ResetPasswordDTO } from "../dto/auth.dto";
 import { PasswordReset } from "../entity/password-reset.entity";
-import { IncorrectLoginCredentials, IncorrectOTP, PasswordResetAttemptExpired, SystemAdminCannotRegisterError } from "../errors";
+import { IncorrectLoginCredentials, IncorrectOTP, PasswordResetAttemptExpired, RestaurantDataRequiredError, SystemAdminCannotRegisterError } from "../errors";
 import { createPasswordReset, findLatestPasswordResetAttemptByUserId, setPasswordResetConsumedAt } from "../repository/password-reset.repo";
 import { comparePasswordHash, generateAccessToken, generateOTP, generateRefreshToken, hashOTP, hashPassword, verifyRefreshToken } from "../utils";
 import { minutes } from "../../../common/utils/time";
 import { NotAuthenticatedError } from "../../../common/auth/errors";
+import { restaurantService, RestaurantService } from "../../restaurant/service/restaurant.service";
+import { db } from "../../../common/knex/knex";
+import { Restaurant } from "../../restaurant/entity/restaurant.entity";
 
 export class AuthService {
+    constructor(private readonly restaurantService: RestaurantService) { }
+
     register: any = async (data: RegisterDTO) => {
         if (data.role === SystemRole.SYSTEM_ADMIN) {
             throw SystemAdminCannotRegisterError;
@@ -25,13 +29,36 @@ export class AuthService {
 
         const passwordHash = await hashPassword(data.password);
 
-        const user: User = await createUser(new User({
-            email: data.email,
-            phone: data.phone,
-            name: data.name,
-            passwordHash: passwordHash,
-            systemRole: data.role
-        }));
+        let user: User;
+        let restaurant: Partial<Restaurant> | undefined;
+        const transaction = await db.transaction();
+
+        try {
+            user = await createUser(new User({
+                email: data.email,
+                phone: data.phone,
+                name: data.name,
+                passwordHash: passwordHash,
+                systemRole: data.role
+            }), transaction);
+
+            if (data.role === SystemRole.RESTAURANT_USER) {
+                if (data.restaurant == undefined) {
+                    throw RestaurantDataRequiredError;
+                }
+
+                restaurant = await this.restaurantService.createRestaurant(
+                    user.id,
+                    data.restaurant,
+                    transaction
+                );
+            }
+
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
 
         const payload = {
             userId: user.id,
@@ -51,7 +78,8 @@ export class AuthService {
                 email: user.email,
                 phone: user.phone,
                 role: user.systemRole,
-            }
+            },
+            restaurant: restaurant
         };
     }
 
@@ -161,4 +189,4 @@ export class AuthService {
 }
 
 // singleton pattern: only one instance of UserService accorss the application to optimize memory
-export const authService = new AuthService();
+export const authService = new AuthService(restaurantService);

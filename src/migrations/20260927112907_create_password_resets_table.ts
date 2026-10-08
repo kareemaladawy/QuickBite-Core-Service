@@ -12,7 +12,7 @@ export async function up(knex: Knex): Promise<void> {
                 created_at timestamp not null,
                 consumed_at timestamp,
 
-                constraint fk_password_resets_user_id foreign key (user_id) references users(id)
+                constraint fk_password_resets_user_id foreign key (user_id) references users(id) on delete cascade
             );
 
             create index idx_password_resets_user_id on password_resets(user_id);

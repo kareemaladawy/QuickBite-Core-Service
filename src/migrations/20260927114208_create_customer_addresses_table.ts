@@ -19,7 +19,7 @@ export async function up(knex: Knex): Promise<void> {
                 is_default boolean not null,
                 created_at timestamp not null,
 
-                constraint fk_customer_addresses_user_id foreign key (user_id) references users(id)
+                constraint fk_customer_addresses_user_id foreign key (user_id) references users(id) on delete cascade
             );
 
             create index idx_customer_addresses_user_id on customer_addresses(user_id);

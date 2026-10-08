@@ -3,7 +3,7 @@ import { plainToInstance } from "class-transformer";
 import AppError from "../errors/AppError";
 
 export async function validateBody<T extends Object>(cls: new () => T, body: unknown): Promise<T> {
-    const instance: T = plainToInstance(cls, body);
+    const instance: T = plainToInstance(cls, body && typeof body === "object" ? body : {});
     const errors = await validate(instance, { whitelist: true });
 
     if (errors.length > 0) {
