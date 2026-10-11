@@ -7,6 +7,8 @@ export interface JwtPayload {
     userId: number;
     email: string;
     role: string;
+    restaurantId?: number,
+    restaurantRole?: string,
 }
 
 export async function hashPassword(password: string): Promise<string> {

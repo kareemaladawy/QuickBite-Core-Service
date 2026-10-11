@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { userController } from "./controller/user.controller";
-import { authenticate } from "../../common/auth/guard";
+import { authenticate } from "../../common/auth/middleware/guard";
 
 export const userRouter = Router();
 

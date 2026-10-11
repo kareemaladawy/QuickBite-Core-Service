@@ -118,3 +118,11 @@ export async function findBranchById(id: number): Promise<Branch | undefined> {
 
     return row ? toEntity(row) : undefined;
 }
+
+export async function branchExistsById(id: number): Promise<boolean> {
+    const result = await db.raw(`select exists (select 1 from branches where id = ?) as "exists"`, [
+        id,
+    ]);
+
+    return result.rows[0].exists;
+}

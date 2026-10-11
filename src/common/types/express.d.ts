@@ -4,7 +4,9 @@ declare namespace Express {
         user?: {
             userId: number,
             role: string,
-            email: string
+            email: string,
+            restaurantId?: number,
+            restaurantRole?: string,
         }
     }
 }

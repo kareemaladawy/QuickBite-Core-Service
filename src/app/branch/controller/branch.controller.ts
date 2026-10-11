@@ -5,6 +5,7 @@ import { SystemRole } from "../../user/enums";
 import { CreateBranchDTO, UpdateBranchDetailsDTO, UpdateBranchStatusDTO } from "../dto/branch.dto";
 import { validateBody } from "../../../common/validation/validate";
 import { UnauthorizedError } from "../errors";
+import { setMemberBranches } from "../../rbac/repository/member-branch.repo";
 
 export class BranchController {
     constructor(
@@ -69,7 +70,7 @@ export class BranchController {
             }
 
             const validated = await validateBody(CreateBranchDTO, req.body);
-            const branch = await this.branchService.createBranch(restaurantId, validated);
+            const branch = await this.branchService.createBranch(restaurantId, userId, validated);
 
             res.status(201).json(branch);
         } catch (error) {

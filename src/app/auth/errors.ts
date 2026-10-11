@@ -12,6 +12,18 @@ export const IncorrectLoginCredentials = new AppError(
     true
 );
 
+export const NoMemberProfileFound = new AppError(
+    "No member profile found for your account",
+    401,
+    true
+);
+
+export const NoSuitableRoleFound = new AppError(
+    "No suitable role found for your account",
+    400,
+    true
+);
+
 export const PasswordResetAttemptExpired = new AppError(
     "Your password reset attempt was not found or expired. Please try again",
     401,

@@ -5,8 +5,13 @@ import { RestaurantStatus } from "../enums";
 import { createRestaurant, findRestaurantById, getRestaurants, updateRestaurant, updateRestaurantStatus } from "../repository/restaurant.repo";
 import { RestaurantNotFoundError } from "../errors";
 import { UpdateRestaurantDto } from "../dto/restaurant.dto";
+import { restaurantMemberService, RestaurantMemberService } from "../../rbac/service/restaurant-member.service";
 
 export class RestaurantService {
+    constructor(
+        private readonly restaurantMemberService: RestaurantMemberService
+    ) { }
+
     getRestaurants: any = async () => {
         const restaurants = await getRestaurants();
 
@@ -23,7 +28,7 @@ export class RestaurantService {
         return restaurant;
     }
 
-    createRestaurant: any = async (userId: number, data: RegisterRestaurantDTO, transaction: Knex) => {
+    createWithOwner: any = async (userId: number, data: RegisterRestaurantDTO, transaction: Knex) => {
         const restaurant = await createRestaurant(new Restaurant({
             ownerId: userId,
             name: data.name,
@@ -32,16 +37,16 @@ export class RestaurantService {
             logoURL: data.logoURL,
         }), transaction);
 
-        return restaurant;
+        await this.restaurantMemberService.createOwnerMember(restaurant.id, userId, transaction);
     }
 
-    updateRestaurantStatus = async (id: number, status: RestaurantStatus) => {
+    updateRestaurantStatus = async (id: number, status: RestaurantStatus): Promise<void> => {
         await updateRestaurantStatus(id, status);
     }
 
-    updateRestaurant = async (id: number, data: UpdateRestaurantDto) => {
+    updateRestaurant = async (id: number, data: UpdateRestaurantDto): Promise<void> => {
         await updateRestaurant(id, data);
     }
 }
 
-export const restaurantService = new RestaurantService();
+export const restaurantService = new RestaurantService(restaurantMemberService);

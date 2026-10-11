@@ -1,53 +1,69 @@
 import { User } from "../../user/entity/user.entity";
 import { SystemRole } from "../../user/enums";
-import { UserAlreadyExistsError } from "../../user/errors";
-import { createUser, findUserByEmail, findUserById, updateUserPassword, userExistsByEmailOrPhone } from "../../user/repository/user.repo";
+import { findUserByEmail, findUserById, updateUserPassword } from "../../user/repository/user.repo";
 import { ForgetPasswordDTO, LoginDTO, RegisterDTO, ResetPasswordDTO } from "../dto/auth.dto";
 import { PasswordReset } from "../entity/password-reset.entity";
-import { IncorrectLoginCredentials, IncorrectOTP, PasswordResetAttemptExpired, RestaurantDataRequiredError, SystemAdminCannotRegisterError } from "../errors";
+import { IncorrectLoginCredentials, IncorrectOTP, NoMemberProfileFound, PasswordResetAttemptExpired, RestaurantDataRequiredError, SystemAdminCannotRegisterError } from "../errors";
 import { createPasswordReset, findLatestPasswordResetAttemptByUserId, setPasswordResetConsumedAt } from "../repository/password-reset.repo";
-import { comparePasswordHash, generateAccessToken, generateOTP, generateRefreshToken, hashOTP, hashPassword, verifyRefreshToken } from "../utils";
+import { comparePasswordHash, generateAccessToken, generateOTP, generateRefreshToken, hashOTP, verifyRefreshToken } from "../utils";
 import { minutes } from "../../../common/utils/time";
 import { NotAuthenticatedError } from "../../../common/auth/errors";
 import { restaurantService, RestaurantService } from "../../restaurant/service/restaurant.service";
 import { db } from "../../../common/knex/knex";
 import { Restaurant } from "../../restaurant/entity/restaurant.entity";
+import { activateRestaurantMember, findRestaurantMemberWithRoleName } from "../../rbac/repository/restaurant-member.repo";
+import { userService, UserService } from "../../user/service/user.service";
+import { restaurantMemberService, RestaurantMemberService } from "../../rbac/service/restaurant-member.service";
 
 export class AuthService {
-    constructor(private readonly restaurantService: RestaurantService) { }
+    constructor(
+        private readonly userService: UserService,
+        private readonly restaurantMemberService: RestaurantMemberService,
+        private readonly restaurantService: RestaurantService
+    ) { }
+
+    generateRestaurantMemberInfoPayload: any = async (user: User) => {
+        const memberData = await findRestaurantMemberWithRoleName(Number(user.id));
+
+        if (!memberData.member) {
+            throw NoMemberProfileFound;
+        }
+
+        if (memberData) {
+            return {
+                restaurantId: memberData.member.restaurantId,
+                restaurantRole: memberData.roleName,
+            }
+        }
+
+        return {};
+    }
 
     register: any = async (data: RegisterDTO) => {
         if (data.role === SystemRole.SYSTEM_ADMIN) {
             throw SystemAdminCannotRegisterError;
         }
 
-        const userExists = await userExistsByEmailOrPhone(data.email, data.phone);
-
-        if (userExists) {
-            throw UserAlreadyExistsError;
-        }
-
-        const passwordHash = await hashPassword(data.password);
-
-        let user: User;
+        let user;
         let restaurant: Partial<Restaurant> | undefined;
+        let restaurantMemberInfo;
         const transaction = await db.transaction();
 
         try {
-            user = await createUser(new User({
+            user = await this.userService.create({
+                name: data.name,
                 email: data.email,
                 phone: data.phone,
-                name: data.name,
-                passwordHash: passwordHash,
+                password: data.password,
                 systemRole: data.role
-            }), transaction);
+            }, transaction);
 
             if (data.role === SystemRole.RESTAURANT_USER) {
                 if (data.restaurant == undefined) {
                     throw RestaurantDataRequiredError;
                 }
 
-                restaurant = await this.restaurantService.createRestaurant(
+                await this.restaurantService.createWithOwner(
                     user.id,
                     data.restaurant,
                     transaction
@@ -55,6 +71,8 @@ export class AuthService {
             }
 
             await transaction.commit();
+
+            restaurantMemberInfo = await this.generateRestaurantMemberInfoPayload(user);
         } catch (error) {
             await transaction.rollback();
             throw error;
@@ -63,7 +81,8 @@ export class AuthService {
         const payload = {
             userId: user.id,
             email: user.email,
-            role: user.systemRole
+            role: user.systemRole,
+            ...restaurantMemberInfo
         };
 
         const accessToken = generateAccessToken(payload);
@@ -96,10 +115,17 @@ export class AuthService {
             throw IncorrectLoginCredentials;
         }
 
+        let restaurantMemberInfo;
+
+        if (user.systemRole === SystemRole.RESTAURANT_USER) {
+            restaurantMemberInfo = await this.generateRestaurantMemberInfoPayload(user);
+        }
+
         const payload = {
             userId: user.id,
             email: user.email,
-            role: user.systemRole
+            role: user.systemRole,
+            ...restaurantMemberInfo
         };
 
         const accessToken = generateAccessToken(payload);
@@ -133,10 +159,17 @@ export class AuthService {
             throw NotAuthenticatedError;
         }
 
+        let restaurantMemberInfo;
+
+        if (user.systemRole === SystemRole.RESTAURANT_USER) {
+            restaurantMemberInfo = await this.generateRestaurantMemberInfoPayload(user);
+        }
+
         const payload = {
             userId: user.id,
             email: user.email,
-            role: user.systemRole
+            role: user.systemRole,
+            ...restaurantMemberInfo
         };
 
         return {
@@ -185,8 +218,16 @@ export class AuthService {
 
         updateUserPassword(user.id, data.password);
         setPasswordResetConsumedAt(passwordResetAttempt.id);
+
+        return user;
+    }
+
+    acceptInvite = async (data: ResetPasswordDTO) => {
+        const user = await this.resetPassword(data);
+
+        await activateRestaurantMember(user.id);
     }
 }
 
 // singleton pattern: only one instance of UserService accorss the application to optimize memory
-export const authService = new AuthService(restaurantService);
+export const authService = new AuthService(userService, restaurantMemberService, restaurantService);

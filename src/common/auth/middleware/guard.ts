@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { NotAuthenticatedError } from "./errors";
-import { verifyAccessToken } from "../../app/auth/utils";
+import { NotAuthenticatedError } from "../errors";
+import { verifyAccessToken } from "../../../app/auth/utils";
 
 export function authenticate(req: Request, res: Response, next: NextFunction) {
     const accessToken = req.cookies.access_token;

@@ -3,7 +3,7 @@ export class PasswordReset {
     userId: number;
     otpHash: string;
     expiresAt: Date;
-    createdAt?: Date;
+    createdAt: Date;
     consumedAt?: Date | null;
 
     constructor(data: Partial<PasswordReset>) {

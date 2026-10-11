@@ -22,12 +22,14 @@ function setTokenCookies(accessToken: string, refreshToken: string, res: Respons
 }
 
 export class AuthController {
-    constructor(private readonly AuthService: AuthService) { }
+    constructor(private readonly authService: AuthService) { }
 
     register = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const validated = await validateBody(RegisterDTO, req.body);
-            const result = await this.AuthService.register(validated);
+            const result = await this.authService.register(validated);
+
+            setTokenCookies(result.accessToken, result.refreshToken, res);
 
             return res.status(201).json(result);
         } catch (error) {
@@ -38,7 +40,7 @@ export class AuthController {
     login = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const validated = await validateBody(LoginDTO, req.body);
-            const result = await this.AuthService.login(validated);
+            const result = await this.authService.login(validated);
 
             setTokenCookies(result.accessToken, result.refreshToken, res);
 
@@ -56,7 +58,7 @@ export class AuthController {
                 throw NotAuthenticatedError;
             }
 
-            const result = await this.AuthService.refreshToken(refreshToken);
+            const result = await this.authService.refreshToken(refreshToken);
 
             setTokenCookies(result.accessToken, result.refreshToken, res);
 
@@ -69,7 +71,7 @@ export class AuthController {
     forgetPassword = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const validated = await validateBody(ForgetPasswordDTO, req.body);
-            await this.AuthService.forgetPassword(validated);
+            await this.authService.forgetPassword(validated);
 
             return res.status(200).json({ message: "An email was sent to you if your email is registered" });
         } catch (error) {
@@ -80,9 +82,20 @@ export class AuthController {
     resetPassword = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const validated = await validateBody(ResetPasswordDTO, req.body);
-            await this.AuthService.resetPassword(validated);
+            await this.authService.resetPassword(validated);
 
             return res.status(200).json({ message: "Your password was reset" });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    acceptInvite = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const validated = await validateBody(ResetPasswordDTO, req.body);
+            await this.authService.acceptInvite(validated);
+
+            return res.status(200).json({ message: "Your invitation was accepted" });
         } catch (error) {
             next(error);
         }

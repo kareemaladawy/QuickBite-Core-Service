@@ -1,0 +1,25 @@
+import { hours } from "../../../common/utils/time";
+import { getPermissionsDetailsByRoleName } from "../repository/permission.repo";
+
+class PermissionCacheService {
+    private cache: Map<string, { permissions: string[], cachedAt: number }> = new Map();
+    private readonly TTL = hours(1);
+
+    async getPermissionsDetailsByRoleName(roleName: string): Promise<string[]> {
+        const cached = this.cache.get(roleName);
+        if (cached && cached.cachedAt > Date.now() - this.TTL) {
+            return cached.permissions;
+        }
+
+        const permissions = await getPermissionsDetailsByRoleName(roleName);
+        this.cache.set(roleName, { permissions, cachedAt: Date.now() });
+
+        return permissions;
+    }
+
+    hasPermissions(permissions: string[], resource: string, action: string): boolean {
+        return permissions.includes(`${resource}:${action}`);
+    }
+}
+
+export const permissionCacheService = new PermissionCacheService();

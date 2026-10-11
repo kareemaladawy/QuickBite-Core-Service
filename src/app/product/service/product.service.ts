@@ -1,4 +1,3 @@
-import { UnAuthorisedError } from "../../../common/auth/errors";
 import { RestaurantNotFoundError } from "../../restaurant/errors";
 import { findRestaurantById } from "../../restaurant/repository/restaurant.repo";
 import { ProductNotFoundError } from "../errors";
@@ -14,9 +13,6 @@ export class ProductService {
     create = async (restaurantId: number, userId: number, userRole: SystemRole, data: CreateProductDTO) => {
         const restaurant = await findRestaurantById(restaurantId);
         if (!restaurant) throw RestaurantNotFoundError;
-        if (userRole !== SystemRole.SYSTEM_ADMIN && Number(restaurant.ownerId) !== Number(userId)) {
-            throw UnAuthorisedError;
-        }
 
         let categoryId: number | null = null;
 
@@ -51,9 +47,6 @@ export class ProductService {
     findByRestaurant = async (restaurantId: number, userId: number, userRole: SystemRole) => {
         const restaurant = await findRestaurantById(restaurantId);
         if (!restaurant) throw RestaurantNotFoundError;
-        if (userRole !== SystemRole.SYSTEM_ADMIN && Number(restaurant.ownerId) !== Number(userId)) {
-            throw UnAuthorisedError;
-        }
 
         return await findProductsByRestaurant(restaurantId);
     }
@@ -82,9 +75,6 @@ export class ProductService {
 
         const restaurant = await findRestaurantById(product.restaurantId);
         if (!restaurant) throw RestaurantNotFoundError;
-        if (userRole !== SystemRole.SYSTEM_ADMIN && Number(restaurant.ownerId) !== Number(userId)) {
-            throw UnAuthorisedError;
-        }
 
         let categoryId: number | undefined = undefined;
         if (data.categoryName) {
