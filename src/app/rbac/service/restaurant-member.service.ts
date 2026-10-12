@@ -1,6 +1,6 @@
 import { Knex } from "knex";
-import { db } from "../../../common/knex/knex";
-import { minutes } from "../../../common/utils/time";
+import { db } from "../../../lib/knex/knex";
+import { minutes } from "../../../pkg/utils/time";
 import { PasswordReset } from "../../auth/entity/password-reset.entity";
 import { createPasswordReset } from "../../auth/repository/password-reset.repo";
 import { generateOTP, hashOTP } from "../../auth/utils";

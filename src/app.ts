@@ -1,7 +1,7 @@
 import express from 'express';
 import { routes } from './routes.js';
-import { errorHandler } from './common/errors/errorHandler.js';
-import { correlationId } from './common/correlation/correlationId.js';
+import { errorHandler } from './lib/errors/errorHandler.js';
+import { correlationId } from './lib/correlation/correlationId.js';
 import cookieParser from 'cookie-parser';
 
 export function createApp() {

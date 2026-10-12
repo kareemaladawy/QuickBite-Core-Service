@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { db } from "../../../common/knex/knex";
+import { db } from "../../../lib/knex/knex";
 import { Product } from "../entity/product.entity";
 
 const PRODUCT_COLUMNS = [

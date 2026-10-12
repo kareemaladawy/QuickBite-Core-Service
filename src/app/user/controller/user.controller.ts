@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { userService, UserService } from "../service/user.service";
-import { validateBody } from "../../../common/validation/validate";
+import { validateBody } from "../../../lib/validation/validate";
 import { UpdateProfileDTO } from "../dto/user.dto";
 
 export class UserController {

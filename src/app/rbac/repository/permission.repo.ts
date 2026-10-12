@@ -1,4 +1,4 @@
-import { db } from "../../../common/knex/knex";
+import { db } from "../../../lib/knex/knex";
 import { Permission } from "../entity/permission.entity";
 
 const permissionColumns = [

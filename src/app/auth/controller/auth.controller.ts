@@ -1,10 +1,10 @@
 import { env } from "node:process";
-import { validateBody } from "../../../common/validation/validate";
+import { validateBody } from "../../../lib/validation/validate";
 import { ForgetPasswordDTO, LoginDTO, RegisterDTO, ResetPasswordDTO } from "../dto/auth.dto";
 import { authService, AuthService } from "../service/auth.service";
 import { NextFunction, Request, Response } from "express";
-import { days, hours } from "../../../common/utils/time";
-import { NotAuthenticatedError } from "../../../common/auth/errors";
+import { days, hours } from "../../../pkg/utils/time";
+import { NotAuthenticatedError } from "../../../lib/auth/errors";
 
 function setTokenCookies(accessToken: string, refreshToken: string, res: Response) {
     res.cookie("access_token", accessToken, {

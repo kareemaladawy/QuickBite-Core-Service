@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { productController } from "./controller/product.controller";
-import { authenticate } from "../../common/auth/middleware/guard";
-import { rbac, requireBranchAccess, requireRestaurantMember } from "../../common/auth/middleware/rbac";
+import { authenticate } from "../../lib/auth/middleware/guard";
+import { rbac, requireBranchAccess, requireRestaurantMember } from "../../lib/auth/middleware/rbac";
 
 export const productRouter = Router();
 

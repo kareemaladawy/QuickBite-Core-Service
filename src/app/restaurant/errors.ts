@@ -1,4 +1,4 @@
-import AppError from "../../common/errors/AppError";
+import AppError from "../../lib/errors/AppError";
 
 export const RestaurantNotFoundError = new AppError(
     "Restaurant not found",

@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 import { Branch } from "../entity/branch.entity";
-import { db } from "../../../common/knex/knex";
+import { db } from "../../../lib/knex/knex";
 import { RestaurantStatus } from "../../restaurant/enums";
 import { UpdateBranchDetailsDTO, UpdateBranchStatusDTO } from "../dto/branch.dto";
 

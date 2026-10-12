@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { restaurantMemberService, RestaurantMemberService } from "../service/restaurant-member.service";
 import { CreateRestaurantMemberDTO, SetRestaurantMemberBranchesDTO, UpdateRestaurantMemberDTO } from "../dto/restaurant-member.dto";
-import { validateBody } from "../../../common/validation/validate";
-import { PermissionDeniedError } from "../../../common/auth/errors";
+import { validateBody } from "../../../lib/validation/validate";
+import { PermissionDeniedError } from "../../../lib/auth/errors";
 import { memberBranchCacheService } from "../service/member-branch-cache.service";
 
 export class RestaurantMemberController {

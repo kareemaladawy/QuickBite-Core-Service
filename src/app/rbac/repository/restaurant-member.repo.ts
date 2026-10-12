@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 import { RestaurantMember } from "../entity/restaurant-member.entity";
-import { db } from "../../../common/knex/knex";
+import { db } from "../../../lib/knex/knex";
 import { MemberStatus } from "../enums";
 import { UpdateRestaurantMemberDTO } from "../dto/restaurant-member.dto";
 

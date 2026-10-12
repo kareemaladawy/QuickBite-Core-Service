@@ -6,7 +6,7 @@ import { CreateProductDTO, UpdateProductDTO } from "../dto/product.dto";
 import { createProduct, findProductById, findProductsByBranch, findProductsByRestaurant, updateProduct } from "../repository/product.repository";
 import { findCategoryByName, findCategoriesByRestaurant, createCategory } from "../repository/category.repository";
 import { updateBranchDetails } from "../repository/product-branch.repository";
-import { db } from "../../../common/knex/knex";
+import { db } from "../../../lib/knex/knex";
 
 export class ProductService {
 

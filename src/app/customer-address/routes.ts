@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { customerAddressController } from "./controller/customer-address.controller";
-import { authenticate } from "../../common/auth/middleware/guard";
+import { authenticate } from "../../lib/auth/middleware/guard";
 
 export const customerAddressRouter = Router();
 

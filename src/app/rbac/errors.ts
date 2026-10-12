@@ -1,4 +1,4 @@
-import AppError from "../../common/errors/AppError";
+import AppError from "../../lib/errors/AppError";
 
 export const CannotCreateOwnerError = new AppError("Cannot create an owner", 400);
 export const RoleNotFoundError = new AppError("Role not found", 404);

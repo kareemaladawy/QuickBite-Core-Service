@@ -1,4 +1,4 @@
-import { hours } from "../../../common/utils/time";
+import { hours } from "../../../pkg/utils/time";
 import { getPermissionsDetailsByRoleName } from "../repository/permission.repo";
 
 class PermissionCacheService {

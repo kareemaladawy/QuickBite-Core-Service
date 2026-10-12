@@ -3,7 +3,7 @@ import { branchService, BranchService } from "../service/branch.service";
 import { restaurantService, RestaurantService } from "../../restaurant/service/restaurant.service";
 import { SystemRole } from "../../user/enums";
 import { CreateBranchDTO, UpdateBranchDetailsDTO, UpdateBranchStatusDTO } from "../dto/branch.dto";
-import { validateBody } from "../../../common/validation/validate";
+import { validateBody } from "../../../lib/validation/validate";
 import { UnauthorizedError } from "../errors";
 import { setMemberBranches } from "../../rbac/repository/member-branch.repo";
 

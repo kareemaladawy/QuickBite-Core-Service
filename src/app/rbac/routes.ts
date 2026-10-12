@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { authenticate } from "../../common/auth/middleware/guard";
+import { authenticate } from "../../lib/auth/middleware/guard";
 import { restaurantMemberController } from "./controller/restaurant-member.controller";
-import { rbac, requireRestaurantMember } from "../../common/auth/middleware/rbac";
+import { rbac, requireRestaurantMember } from "../../lib/auth/middleware/rbac";
 
 export const restaurantMemberRouter = Router();
 

@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { env } from "../../common/config/env";
+import { env } from "../../lib/config/env";
 import jwt, { SignOptions } from "jsonwebtoken";
 
 export interface JwtPayload {

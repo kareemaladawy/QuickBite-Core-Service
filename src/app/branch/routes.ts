@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { authenticate } from "../../common/auth/middleware/guard";
+import { authenticate } from "../../lib/auth/middleware/guard";
 import { branchController } from "./controller/branch.controller";
-import { rbac, requireBranchAccess, requireRestaurantMember } from "../../common/auth/middleware/rbac";
+import { rbac, requireBranchAccess, requireRestaurantMember } from "../../lib/auth/middleware/rbac";
 
 export const branchRouter = Router();
 

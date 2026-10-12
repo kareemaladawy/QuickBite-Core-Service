@@ -1,4 +1,4 @@
-import AppError from "../../common/errors/AppError";
+import AppError from "../../lib/errors/AppError";
 
 export const SystemAdminCannotRegisterError = new AppError(
     "You cannot register as a system admin",

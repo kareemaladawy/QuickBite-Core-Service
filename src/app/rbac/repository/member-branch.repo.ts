@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { db } from "../../../common/knex/knex";
+import { db } from "../../../lib/knex/knex";
 
 export async function setMemberBranches(memberId: number, branchIds: number[], transaction: Knex = db): Promise<void> {
     await transaction("member_branch").where("member_id", memberId).delete();

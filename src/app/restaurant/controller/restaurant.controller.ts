@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { RestaurantService } from "../service/restaurant.service";
-import { validateBody } from "../../../common/validation/validate";
+import { validateBody } from "../../../lib/validation/validate";
 import { UpdateRestaurantDto, UpdateRestaurantStatusDto } from "../dto/restaurant.dto";
 import { SystemRole } from "../../user/enums";
 import { InvalidRestaurantIdError, UnauthorizedError } from "../errors";
