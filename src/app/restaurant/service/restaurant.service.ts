@@ -5,11 +5,14 @@ import { RestaurantStatus } from "../enums";
 import { createRestaurant, findRestaurantById, getRestaurants, updateRestaurant, updateRestaurantStatus } from "../repository/restaurant.repo";
 import { RestaurantNotFoundError } from "../errors";
 import { UpdateRestaurantDto } from "../dto/restaurant.dto";
-import { restaurantMemberService, RestaurantMemberService } from "../../rbac/service/restaurant-member.service";
+import { RestaurantMemberService } from "../../rbac/service/restaurant-member.service";
+import { inject, injectable } from "tsyringe";
+import { TOKENS } from "../../../lib/di/tokens";
 
+@injectable()
 export class RestaurantService {
     constructor(
-        private readonly restaurantMemberService: RestaurantMemberService
+        @inject(TOKENS.RestaurantMemberService) private readonly restaurantMemberService: RestaurantMemberService
     ) { }
 
     getRestaurants: any = async () => {
@@ -48,5 +51,3 @@ export class RestaurantService {
         await updateRestaurant(id, data);
     }
 }
-
-export const restaurantService = new RestaurantService(restaurantMemberService);

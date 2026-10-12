@@ -1,5 +1,12 @@
-import { createCustomerAddress, deleteCustomerAddress, listUserCustomerAddresses, updateCustomerAddress } from "../repository/customer-address.repo";
+import { injectable } from "tsyringe";
+import {
+    createCustomerAddress,
+    deleteCustomerAddress,
+    listUserCustomerAddresses,
+    updateCustomerAddress
+} from "../repository/customer-address.repo";
 
+@injectable()
 export class CustomerAddressService {
     listUserCustomerAddresses: any = async (userId: number) => {
         const addresses = await listUserCustomerAddresses(userId);

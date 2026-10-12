@@ -1,12 +1,18 @@
 import { NextFunction, Request, Response } from "express";
-import { restaurantMemberService, RestaurantMemberService } from "../service/restaurant-member.service";
+import { RestaurantMemberService } from "../service/restaurant-member.service";
 import { CreateRestaurantMemberDTO, SetRestaurantMemberBranchesDTO, UpdateRestaurantMemberDTO } from "../dto/restaurant-member.dto";
 import { validateBody } from "../../../lib/validation/validate";
 import { PermissionDeniedError } from "../../../lib/auth/errors";
-import { memberBranchCacheService } from "../service/member-branch-cache.service";
+import { inject, injectable } from "tsyringe";
+import { TOKENS } from "../../../lib/di/tokens";
+import { MemberBranchCacheService } from "../service/member-branch-cache.service";
 
+@injectable()
 export class RestaurantMemberController {
-    constructor(private readonly restaurantMemberService: RestaurantMemberService) { }
+    constructor(
+        @inject(TOKENS.RestaurantMemberService) private readonly restaurantMemberService: RestaurantMemberService,
+        @inject(TOKENS.MemberBranchCacheService) private readonly memberBranchCacheService: MemberBranchCacheService
+    ) { }
 
     listMembers = async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -22,7 +28,7 @@ export class RestaurantMemberController {
         const validated = await validateBody(CreateRestaurantMemberDTO, req.body);
 
         if (validated.branchIds && req.user) {
-            const userBranchIds = await memberBranchCacheService.getBranchIdsByUserId(req.user.userId);
+            const userBranchIds = await this.memberBranchCacheService.getBranchIdsByUserId(req.user.userId);
             const canAccessAllBranchIds = validated.branchIds.every((branchId) => userBranchIds.includes(branchId));
 
             if (!canAccessAllBranchIds) {
@@ -101,5 +107,3 @@ export class RestaurantMemberController {
         }
     }
 }
-
-export const restaurantMemberController = new RestaurantMemberController(restaurantMemberService);

@@ -1,9 +1,11 @@
+import { injectable } from "tsyringe";
 import { hours } from "../../../pkg/utils/time";
 import { getPermissionsDetailsByRoleName } from "../repository/permission.repo";
 
-class PermissionCacheService {
+@injectable()
+export class PermissionCacheService {
     private cache: Map<string, { permissions: string[], cachedAt: number }> = new Map();
-    private readonly TTL = hours(1);
+    private readonly TTL = hours(2);
 
     async getPermissionsDetailsByRoleName(roleName: string): Promise<string[]> {
         const cached = this.cache.get(roleName);
@@ -21,5 +23,3 @@ class PermissionCacheService {
         return permissions.includes(`${resource}:${action}`);
     }
 }
-
-export const permissionCacheService = new PermissionCacheService();

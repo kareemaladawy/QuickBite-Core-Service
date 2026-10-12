@@ -1,9 +1,13 @@
 import { Router } from "express";
 import { authenticate } from "../../lib/auth/middleware/guard";
-import { restaurantMemberController } from "./controller/restaurant-member.controller";
 import { rbac, requireRestaurantMember } from "../../lib/auth/middleware/rbac";
+import { RestaurantMemberController } from "./controller/restaurant-member.controller";
+import { TOKENS } from "../../lib/di/tokens";
+import { container } from "../../lib/di/container";
 
 export const restaurantMemberRouter = Router();
+
+const restaurantMemberController = container.resolve<RestaurantMemberController>(TOKENS.RestaurantMemberController);
 
 restaurantMemberRouter.get(
     '/roles/:roleName/permissions',

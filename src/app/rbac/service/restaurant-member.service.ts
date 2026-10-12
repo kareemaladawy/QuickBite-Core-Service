@@ -4,25 +4,30 @@ import { minutes } from "../../../pkg/utils/time";
 import { PasswordReset } from "../../auth/entity/password-reset.entity";
 import { createPasswordReset } from "../../auth/repository/password-reset.repo";
 import { generateOTP, hashOTP } from "../../auth/utils";
-import { BranchesDontBelongToRestaurantError, BranchNotFoundError } from "../../branch/errors";
-import { User } from "../../user/entity/user.entity";
+import { BranchesDontBelongToRestaurantError } from "../../branch/errors";
 import { SystemRole } from "../../user/enums";
 import { UserAlreadyExistsError } from "../../user/errors";
-import { createUser, userExistsByEmailOrPhone } from "../../user/repository/user.repo";
+import { userExistsByEmailOrPhone } from "../../user/repository/user.repo";
 import { CreateRestaurantMemberDTO, UpdateRestaurantMemberDTO } from "../dto/restaurant-member.dto";
 import { RestaurantMember } from "../entity/restaurant-member.entity";
 import { MemberRole, MemberStatus } from "../enums";
 import { CannotCreateOwnerError, MemberNotFoundError, RoleNotFoundError } from "../errors";
 import { countBranchesByIdsAndRestaurant, setMemberBranches } from "../repository/member-branch.repo";
 import { getRolePermissions } from "../repository/permission.repo";
-import { createRestaurantMember, deleteRestaurantMember, findMembersByRestaurantId, findRestaurantMemberById, findRestaurantMemberWithRoleName, updateRestaurantMember } from "../repository/restaurant-member.repo";
+import { createRestaurantMember, deleteRestaurantMember, findMembersByRestaurantId, findRestaurantMemberById, updateRestaurantMember } from "../repository/restaurant-member.repo";
 import { findRoleIdByName } from "../repository/role.repo";
 import { NoSuitableRoleFound } from "../../auth/errors";
-import { userService, UserService } from "../../user/service/user.service";
-import { memberBranchCacheService } from "./member-branch-cache.service";
+import { UserService } from "../../user/service/user.service";
+import { inject, injectable } from "tsyringe";
+import { TOKENS } from "../../../lib/di/tokens";
+import { MemberBranchCacheService } from "./member-branch-cache.service";
 
+@injectable()
 export class RestaurantMemberService {
-    constructor(private readonly userService: UserService) { }
+    constructor(
+        @inject(TOKENS.UserService) private readonly userService: UserService,
+        @inject(TOKENS.MemberBranchCacheService) private readonly memberBranchCacheService: MemberBranchCacheService,
+    ) { }
 
     listMembers = async (restaurantId: number) => {
         const members = await findMembersByRestaurantId(restaurantId);
@@ -88,7 +93,7 @@ export class RestaurantMemberService {
             }), transaction);
 
             await setMemberBranches(member.id!, data.branchIds ?? [], transaction);
-            memberBranchCacheService.invalidate(user.id!);
+            this.memberBranchCacheService.invalidate(user.id!);
 
             // generate otp, password reset record, mock email send
 
@@ -140,7 +145,7 @@ export class RestaurantMemberService {
         }
 
         await deleteRestaurantMember(memberId);
-        memberBranchCacheService.invalidate(member.userId!);
+        this.memberBranchCacheService.invalidate(member.userId!);
     }
 
     setMemberBranches = async (restaurantId: number, memberId: number, branchIds: number[]) => {
@@ -162,7 +167,7 @@ export class RestaurantMemberService {
             await setMemberBranches(memberId, branchIds, transaction);
 
             await transaction.commit();
-            memberBranchCacheService.invalidate(member.userId!);
+            this.memberBranchCacheService.invalidate(member.userId!);
         } catch (error) {
             await transaction.rollback();
             throw error;
@@ -177,5 +182,3 @@ export class RestaurantMemberService {
         }
     }
 }
-
-export const restaurantMemberService = new RestaurantMemberService(userService);

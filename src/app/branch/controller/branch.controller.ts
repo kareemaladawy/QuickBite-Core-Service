@@ -1,16 +1,18 @@
 import { NextFunction, Request, Response } from "express";
-import { branchService, BranchService } from "../service/branch.service";
-import { restaurantService, RestaurantService } from "../../restaurant/service/restaurant.service";
+import { BranchService } from "../service/branch.service";
+import { RestaurantService } from "../../restaurant/service/restaurant.service";
 import { SystemRole } from "../../user/enums";
 import { CreateBranchDTO, UpdateBranchDetailsDTO, UpdateBranchStatusDTO } from "../dto/branch.dto";
 import { validateBody } from "../../../lib/validation/validate";
 import { UnauthorizedError } from "../errors";
-import { setMemberBranches } from "../../rbac/repository/member-branch.repo";
+import { inject, injectable } from "tsyringe";
+import { TOKENS } from "../../../lib/di/tokens";
 
+@injectable()
 export class BranchController {
     constructor(
-        private readonly branchService: BranchService,
-        private readonly restaurantService: RestaurantService
+        @inject(TOKENS.BranchService) private readonly branchService: BranchService,
+        @inject(TOKENS.RestaurantService) private readonly restaurantService: RestaurantService
     ) { }
 
     listBranchesByRestaurantId = async (req: Request, res: Response, next: NextFunction) => {
@@ -119,5 +121,3 @@ export class BranchController {
         }
     };
 }
-
-export const branchController = new BranchController(branchService, restaurantService);

@@ -2,18 +2,19 @@ import { Request, Response, NextFunction } from "express";
 import { validateBody } from "../../../lib/validation/validate";
 import { SystemRole } from "../../user/enums";
 import { CreateProductDTO, UpdateProductDTO } from "../dto/product.dto";
-import { ProductService, productService } from "../service/product.service";
+import { ProductService } from "../service/product.service";
+import { inject, injectable } from "tsyringe";
+import { TOKENS } from "../../../lib/di/tokens";
 
+@injectable()
 export class ProductController {
-    constructor(private readonly productService: ProductService) { }
+    constructor(@inject(TOKENS.ProductService) private readonly productService: ProductService) { }
 
     create = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const data = await validateBody(CreateProductDTO, req.body);
             const product = await this.productService.create(
                 Number(req.params.restaurantId),
-                req.user?.userId!,
-                req.user?.role! as SystemRole,
                 data,
             );
 
@@ -86,5 +87,3 @@ export class ProductController {
         }
     }
 }
-
-export const productController = new ProductController(productService);

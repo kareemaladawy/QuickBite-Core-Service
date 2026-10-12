@@ -4,7 +4,9 @@ import { createUser, findUserById, updateUserProfile, userExistsByEmailOrPhone }
 import { hashPassword } from "../../auth/utils";
 import { User } from "../entity/user.entity";
 import { CreateUserData } from "../dto/user.dto";
+import { injectable } from "tsyringe";
 
+@injectable()
 export class UserService {
     create = async (data: CreateUserData, transaction?: Knex): Promise<User> => {
         const userExists = await userExistsByEmailOrPhone(data.email, data.phone);
@@ -58,6 +60,3 @@ export class UserService {
         }
     }
 }
-
-// singleton pattern: only one instance of UserService accorss the application to optimize memory
-export const userService = new UserService();

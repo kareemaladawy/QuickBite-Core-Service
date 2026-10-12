@@ -7,10 +7,11 @@ import { createProduct, findProductById, findProductsByBranch, findProductsByRes
 import { findCategoryByName, findCategoriesByRestaurant, createCategory } from "../repository/category.repository";
 import { updateBranchDetails } from "../repository/product-branch.repository";
 import { db } from "../../../lib/knex/knex";
+import { injectable } from "tsyringe";
 
+@injectable()
 export class ProductService {
-
-    create = async (restaurantId: number, userId: number, userRole: SystemRole, data: CreateProductDTO) => {
+    create = async (restaurantId: number, data: CreateProductDTO) => {
         const restaurant = await findRestaurantById(restaurantId);
         if (!restaurant) throw RestaurantNotFoundError;
 
@@ -104,5 +105,3 @@ export class ProductService {
         return { product: updatedProduct, branchDetails };
     }
 }
-
-export const productService = new ProductService();

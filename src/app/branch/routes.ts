@@ -1,9 +1,13 @@
 import { Router } from "express";
 import { authenticate } from "../../lib/auth/middleware/guard";
-import { branchController } from "./controller/branch.controller";
 import { rbac, requireBranchAccess, requireRestaurantMember } from "../../lib/auth/middleware/rbac";
+import { container } from "../../lib/di/container";
+import { TOKENS } from "../../lib/di/tokens";
+import { BranchController } from "./controller/branch.controller";
 
 export const branchRouter = Router();
+
+const branchController = container.resolve<BranchController>(TOKENS.BranchController);
 
 branchRouter.get('/branches/nearby', branchController.findNearbyBranches);
 

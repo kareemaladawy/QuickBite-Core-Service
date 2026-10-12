@@ -4,9 +4,12 @@ import { validateBody } from "../../../lib/validation/validate";
 import { UpdateRestaurantDto, UpdateRestaurantStatusDto } from "../dto/restaurant.dto";
 import { SystemRole } from "../../user/enums";
 import { InvalidRestaurantIdError, UnauthorizedError } from "../errors";
+import { inject, injectable } from "tsyringe";
+import { TOKENS } from "../../../lib/di/tokens";
 
+@injectable()
 export class RestaurantController {
-    constructor(private readonly restaurantService: RestaurantService) { }
+    constructor(@inject(TOKENS.RestaurantService) private readonly restaurantService: RestaurantService) { }
 
     getRestaurants = async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -82,5 +85,3 @@ export class RestaurantController {
         }
     }
 }
-
-export const restaurantController = new RestaurantController(new RestaurantService());

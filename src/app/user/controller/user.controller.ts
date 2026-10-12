@@ -1,10 +1,13 @@
 import { NextFunction, Request, Response } from "express";
-import { userService, UserService } from "../service/user.service";
+import { UserService } from "../service/user.service";
 import { validateBody } from "../../../lib/validation/validate";
 import { UpdateProfileDTO } from "../dto/user.dto";
+import { inject, injectable } from "tsyringe";
+import { TOKENS } from "../../../lib/di/tokens";
 
+@injectable()
 export class UserController {
-    constructor(private readonly userService: UserService) { };
+    constructor(@inject(TOKENS.UserService) private readonly userService: UserService) { };
 
     getMe: any = async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -27,6 +30,3 @@ export class UserController {
         }
     }
 }
-
-// singleton pattern: only one instance of UserService accorss the application to optimize memory
-export const userController = new UserController(userService);

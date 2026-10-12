@@ -1,9 +1,11 @@
 import { NextFunction, Request, Response } from "express";
+import { container } from "tsyringe";
 import { NotAuthenticatedError, PermissionDeniedError } from "../errors";
 import { SystemRole } from "../../../app/user/enums";
-import { permissionCacheService } from "../../../app/rbac/service/permission-cache.service";
 import { InternalServerError } from "../../../app/rbac/errors";
-import { memberBranchCacheService } from "../../../app/rbac/service/member-branch-cache.service";
+import { TOKENS } from "../../di/tokens";
+import { PermissionCacheService } from "../../../app/rbac/service/permission-cache.service";
+import { MemberBranchCacheService } from "../../../app/rbac/service/member-branch-cache.service";
 
 export interface RBACOptions {
     resource: string;
@@ -27,6 +29,7 @@ export function rbac(options: RBACOptions) {
             }
 
             if (req.user.role == SystemRole.RESTAURANT_USER) {
+                const permissionCacheService = container.resolve<PermissionCacheService>(TOKENS.PermissionCacheService);
                 const permissions = await permissionCacheService.getPermissionsDetailsByRoleName(req.user.restaurantRole!);
 
                 if (!permissionCacheService.hasPermissions(permissions, resource, action)) {
@@ -84,6 +87,7 @@ export function requireBranchAccess(paramName: string = 'branchId') {
                 throw InternalServerError;
             }
 
+            const memberBranchCacheService = container.resolve<MemberBranchCacheService>(TOKENS.MemberBranchCacheService);
             const branchIds = await memberBranchCacheService.getBranchIdsByUserId(req.user.userId);
 
             if (!branchIds.includes(Number(branchId))) {

@@ -1,3 +1,4 @@
+import { injectable } from "tsyringe";
 import { NoMemberProfileFound } from "../../auth/errors";
 import { addMemberBranch } from "../../rbac/repository/member-branch.repo";
 import { findRestaurantMemberWithRoleName } from "../../rbac/repository/restaurant-member.repo";
@@ -7,6 +8,7 @@ import { Branch } from "../entity/branch.entity";
 import { BranchNotFoundError } from "../errors";
 import { createBranch, findBranchById, findNearbyBranches, listBranchesByRestaurantId, updateBranchDetails, updateBranchStatus } from "../repository/branch.repo";
 
+@injectable()
 export class BranchService {
     createBranch: any = async (restaurantId: number, ownerId: number, data: CreateBranchDTO): Promise<Branch> => {
         const now = new Date();
@@ -80,5 +82,3 @@ export class BranchService {
         return branch;
     }
 }
-
-export const branchService = new BranchService();

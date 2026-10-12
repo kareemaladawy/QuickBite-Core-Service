@@ -8,18 +8,19 @@ import { createPasswordReset, findLatestPasswordResetAttemptByUserId, setPasswor
 import { comparePasswordHash, generateAccessToken, generateOTP, generateRefreshToken, hashOTP, verifyRefreshToken } from "../utils";
 import { minutes } from "../../../pkg/utils/time";
 import { NotAuthenticatedError } from "../../../lib/auth/errors";
-import { restaurantService, RestaurantService } from "../../restaurant/service/restaurant.service";
+import { RestaurantService } from "../../restaurant/service/restaurant.service";
 import { db } from "../../../lib/knex/knex";
 import { Restaurant } from "../../restaurant/entity/restaurant.entity";
 import { activateRestaurantMember, findRestaurantMemberWithRoleName } from "../../rbac/repository/restaurant-member.repo";
-import { userService, UserService } from "../../user/service/user.service";
-import { restaurantMemberService, RestaurantMemberService } from "../../rbac/service/restaurant-member.service";
+import { UserService } from "../../user/service/user.service";
+import { inject, injectable } from "tsyringe";
+import { TOKENS } from "../../../lib/di/tokens";
 
+@injectable()
 export class AuthService {
     constructor(
-        private readonly userService: UserService,
-        private readonly restaurantMemberService: RestaurantMemberService,
-        private readonly restaurantService: RestaurantService
+        @inject(TOKENS.UserService) private readonly userService: UserService,
+        @inject(TOKENS.RestaurantService) private readonly restaurantService: RestaurantService
     ) { }
 
     generateRestaurantMemberInfoPayload: any = async (user: User) => {
@@ -228,6 +229,3 @@ export class AuthService {
         await activateRestaurantMember(user.id);
     }
 }
-
-// singleton pattern: only one instance of UserService accorss the application to optimize memory
-export const authService = new AuthService(userService, restaurantMemberService, restaurantService);

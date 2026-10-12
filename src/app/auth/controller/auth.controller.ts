@@ -1,28 +1,15 @@
-import { env } from "node:process";
 import { validateBody } from "../../../lib/validation/validate";
 import { ForgetPasswordDTO, LoginDTO, RegisterDTO, ResetPasswordDTO } from "../dto/auth.dto";
-import { authService, AuthService } from "../service/auth.service";
+import { AuthService } from "../service/auth.service";
 import { NextFunction, Request, Response } from "express";
-import { days, hours } from "../../../pkg/utils/time";
 import { NotAuthenticatedError } from "../../../lib/auth/errors";
+import { setTokenCookies } from "../../../lib/auth/helpers";
+import { inject, injectable } from "tsyringe";
+import { TOKENS } from "../../../lib/di/tokens";
 
-function setTokenCookies(accessToken: string, refreshToken: string, res: Response) {
-    res.cookie("access_token", accessToken, {
-        httpOnly: true,
-        secure: env.nodeEnv === 'production',
-        maxAge: hours(1)
-    })
-
-    res.cookie("refresh_token", refreshToken, {
-        httpOnly: true,
-        secure: env.nodeEnv === 'production',
-        maxAge: days(7),
-        path: "/api/v1/auth/refresh"
-    })
-}
-
+@injectable()
 export class AuthController {
-    constructor(private readonly authService: AuthService) { }
+    constructor(@inject(TOKENS.AuthService) private readonly authService: AuthService) { }
 
     register = async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -101,6 +88,3 @@ export class AuthController {
         }
     }
 }
-
-// singleton pattern: only one instance of UserService accorss the application to optimize memory
-export const authController = new AuthController(authService);
