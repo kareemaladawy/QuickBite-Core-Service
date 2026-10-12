@@ -14,7 +14,7 @@ export class UserController {
         try {
             const user = await this.userService.getUserById(req.user?.userId)
 
-            return sendSuccess(res, user);
+            sendSuccess(res, user);
         } catch (error) {
             next(error);
         }
@@ -25,7 +25,7 @@ export class UserController {
             const validated = await validateBody(UpdateProfileDTO, req.body);
             await this.userService.updateUserById(req.user?.userId, validated)
 
-            return sendSuccess(res, { message: "Profile updated" });
+            sendSuccess(res, { message: "Profile updated" });
         } catch (error) {
             next(error);
         }

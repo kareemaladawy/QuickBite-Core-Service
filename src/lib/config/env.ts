@@ -14,13 +14,17 @@ const schema = z.object({
     DB_MAX_POOL: z.string().default("10"),
     DB_MIGRATIONS_DIR: z.string(),
     DB_MIGRATIONS_EXTENTION: z.string(),
+    REDIS_HOST: z.string().default("localhost"),
+    REDIS_PORT: z.string().default("6379"),
+    REDIS_PASSWORD: z.string().default(""),
     BCRYPT_SALT: z.string().default("10"),
     ACCESS_SECRET: z.string(),
     REFRESH_SECRET: z.string(),
     ACCESS_EXPIRES_IN: z.string().default("3600"),
     REFRESH_EXPIRES_IN: z.string().default("60480"),
     NODE_ENV: z.enum(['local', 'development', 'production']),
-    ACCESS_EXPIRES_IN_MS: z.string().default("3600000")
+    ACCESS_EXPIRES_IN_MS: z.string().default("3600000"),
+    CORS_ORIGINS: z.string().default("http://localhost:3000"),
 })
 
 const parsed = schema.parse(process.env);
@@ -40,10 +44,18 @@ export const env = {
         migrationsDir: path.resolve(__dirname, '../../../', parsed.DB_MIGRATIONS_DIR),
         migrationsExt: parsed.DB_MIGRATIONS_EXTENTION,
     },
+    redis: {
+        host: parsed.REDIS_HOST,
+        port: Number(parsed.REDIS_PORT),
+        password: parsed.REDIS_PASSWORD
+    },
     jwt: {
         accessSecret: parsed.ACCESS_SECRET,
         refreshSecret: parsed.REFRESH_SECRET,
         accessExpiresIn: Number(parsed.ACCESS_EXPIRES_IN),
         refreshExpiresIn: Number(parsed.REFRESH_EXPIRES_IN),
+    },
+    cors: {
+        origins: parsed.CORS_ORIGINS.split(',')
     }
 }

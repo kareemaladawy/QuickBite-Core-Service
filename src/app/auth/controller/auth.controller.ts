@@ -19,7 +19,7 @@ export class AuthController {
 
             setTokenCookies(result.accessToken, result.refreshToken, res);
 
-            return sendCreated(res, result);
+            sendCreated(res, result);
         } catch (error) {
             next(error);
         }
@@ -32,7 +32,7 @@ export class AuthController {
 
             setTokenCookies(result.accessToken, result.refreshToken, res);
 
-            return sendSuccess(res, result);
+            sendSuccess(res, result);
         } catch (error) {
             next(error);
         }
@@ -50,7 +50,7 @@ export class AuthController {
 
             setTokenCookies(result.accessToken, result.refreshToken, res);
 
-            return sendSuccess(res, result);
+            sendSuccess(res, result);
         } catch (error) {
             next(error);
         }
@@ -61,7 +61,7 @@ export class AuthController {
             const validated = await validateBody(ForgetPasswordDTO, req.body);
             await this.authService.forgetPassword(validated);
 
-            return sendSuccess(res, { message: "An email was sent to you if your email is registered" });
+            sendSuccess(res, { message: "An email was sent to you if your email is registered" });
         } catch (error) {
             next(error);
         }
@@ -72,7 +72,7 @@ export class AuthController {
             const validated = await validateBody(ResetPasswordDTO, req.body);
             await this.authService.resetPassword(validated);
 
-            return sendSuccess(res, { message: "Your password was reset" });
+            sendSuccess(res, { message: "Your password was reset" });
         } catch (error) {
             next(error);
         }
@@ -83,7 +83,7 @@ export class AuthController {
             const validated = await validateBody(ResetPasswordDTO, req.body);
             await this.authService.acceptInvite(validated);
 
-            return sendSuccess(res, { message: "Your invitation was accepted" });
+            sendSuccess(res, { message: "Your invitation was accepted" });
         } catch (error) {
             next(error);
         }

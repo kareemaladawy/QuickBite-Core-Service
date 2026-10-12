@@ -8,12 +8,21 @@ import { UpdateRestaurantDto } from "../dto/restaurant.dto";
 import { RestaurantMemberService } from "../../rbac/service/restaurant-member.service";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
+import { ICacheProvider } from "../../../pkg/utils/cache/cache.interface";
+
+// mirrors the key withCache() derives for GET /api/v1/restaurants (no query params, so it's a single fixed key)
+const RESTAURANTS_LIST_CACHE_KEYS = ["GET:/api/v1/restaurants", "GET:/api/v1/restaurants/"];
 
 @injectable()
 export class RestaurantService {
     constructor(
-        @inject(TOKENS.RestaurantMemberService) private readonly restaurantMemberService: RestaurantMemberService
+        @inject(TOKENS.RestaurantMemberService) private readonly restaurantMemberService: RestaurantMemberService,
+        @inject(TOKENS.CacheProvider) private readonly cacheProvider: ICacheProvider
     ) { }
+
+    invalidateRestaurantsListCache = async (): Promise<void> => {
+        await Promise.all(RESTAURANTS_LIST_CACHE_KEYS.map((key) => this.cacheProvider.del(key)));
+    }
 
     getRestaurants: any = async () => {
         const restaurants = await getRestaurants();
@@ -45,9 +54,13 @@ export class RestaurantService {
 
     updateRestaurantStatus = async (id: number, status: RestaurantStatus): Promise<void> => {
         await updateRestaurantStatus(id, status);
+
+        await this.invalidateRestaurantsListCache();
     }
 
     updateRestaurant = async (id: number, data: UpdateRestaurantDto): Promise<void> => {
         await updateRestaurant(id, data);
+
+        await this.invalidateRestaurantsListCache();
     }
 }

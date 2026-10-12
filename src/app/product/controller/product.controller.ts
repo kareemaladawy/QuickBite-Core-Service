@@ -19,7 +19,7 @@ export class ProductController {
                 data,
             );
 
-            return sendCreated(res, product);
+            sendCreated(res, product);
         } catch (error) {
             next(error);
         }
@@ -33,7 +33,7 @@ export class ProductController {
                 req.user?.role! as SystemRole,
             );
 
-            return sendSuccess(res, products);
+            sendSuccess(res, products);
         } catch (error) {
             next(error);
         }
@@ -43,7 +43,7 @@ export class ProductController {
         try {
             const categories = await this.productService.findCategories(Number(req.params.restaurantId));
 
-            return sendSuccess(res, categories);
+            sendSuccess(res, categories);
         } catch (error) {
             next(error);
         }
@@ -53,7 +53,7 @@ export class ProductController {
         try {
             const results = await this.productService.findByBranch(Number(req.params.branchId));
 
-            return sendSuccess(res, results);
+            sendSuccess(res, results);
         } catch (error) {
             next(error);
         }
@@ -63,7 +63,7 @@ export class ProductController {
         try {
             const product = await this.productService.findById(Number(req.params.id));
 
-            return sendSuccess(res, product);
+            sendSuccess(res, product);
         } catch (error) {
             next(error);
         }
@@ -82,7 +82,7 @@ export class ProductController {
                 branchId,
             );
 
-            return sendSuccess(res, { message: "Product updated" });
+            sendSuccess(res, { message: "Product updated" });
         } catch (error) {
             next(error);
         }

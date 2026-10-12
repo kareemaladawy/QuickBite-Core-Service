@@ -19,7 +19,7 @@ export class RestaurantMemberController {
         try {
             const members = await this.restaurantMemberService.listMembers(Number(req.params.restaurantId));
 
-            return sendSuccess(res, members);
+            sendSuccess(res, members);
         } catch (error) {
             next(error);
         }
@@ -43,7 +43,7 @@ export class RestaurantMemberController {
                 validated
             );
 
-            return sendCreated(res, member);
+            sendCreated(res, member);
         } catch (error) {
             next(error);
         }
@@ -59,7 +59,7 @@ export class RestaurantMemberController {
                 validated
             );
 
-            return sendSuccess(res, { message: "Member updated" });
+            sendSuccess(res, { message: "Member updated" });
         } catch (error) {
             next(error);
         }
@@ -75,7 +75,7 @@ export class RestaurantMemberController {
                 validated.branchIds
             );
 
-            return sendSuccess(res, { message: "Member branches updated" });
+            sendSuccess(res, { message: "Member branches updated" });
         } catch (error) {
             next(error);
         }
@@ -88,7 +88,7 @@ export class RestaurantMemberController {
                 Number(req.params.memberId)
             );
 
-            return sendNoContent(res);
+            sendNoContent(res);
         } catch (error) {
             next(error);
         }
@@ -99,7 +99,7 @@ export class RestaurantMemberController {
             const roleName = req.params.roleName as string;
             const permissions = await this.restaurantMemberService.getRolePermissions(roleName);
 
-            return sendSuccess(res, { role: roleName, permissions });
+            sendSuccess(res, { role: roleName, permissions });
         } catch (error) {
             next(error);
         }

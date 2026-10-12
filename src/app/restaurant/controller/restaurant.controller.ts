@@ -16,7 +16,7 @@ export class RestaurantController {
         try {
             const restaurants = await this.restaurantService.getRestaurants();
 
-            return sendSuccess(res, restaurants);
+            sendSuccess(res, restaurants);
         } catch (error) {
             next(error);
         }
@@ -27,7 +27,7 @@ export class RestaurantController {
             const restaurantId = Number(req.params.id);
             const restaurant = await this.restaurantService.findRestaurantById(restaurantId);
 
-            return sendSuccess(res, restaurant);
+            sendSuccess(res, restaurant);
         } catch (error) {
             next(error);
         }
@@ -52,7 +52,7 @@ export class RestaurantController {
                 validated.status
             );
 
-            return sendSuccess(res, { message: "Restaurant status updated" });
+            sendSuccess(res, { message: "Restaurant status updated" });
         } catch (error) {
             next(error);
         }
@@ -68,7 +68,7 @@ export class RestaurantController {
                 validated
             );
 
-            return sendSuccess(res, { message: "Restaurant updated" });
+            sendSuccess(res, { message: "Restaurant updated" });
         } catch (error) {
             next(error);
         }

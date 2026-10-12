@@ -17,6 +17,7 @@ import { ProductController } from '../../app/product/controller/product.controll
 import { RestaurantMemberController } from '../../app/rbac/controller/restaurant-member.controller';
 import { RestaurantController } from '../../app/restaurant/controller/restaurant.controller';
 import { UserController } from '../../app/user/controller/user.controller';
+import { cacheProvider } from '../cache/init';
 
 // Services
 container.registerSingleton(TOKENS.AuthService, AuthService);
@@ -40,5 +41,8 @@ container.registerSingleton(TOKENS.UserController, UserController);
 
 // lib/infrastructure
 container.registerSingleton(TOKENS.Logger, Logger);
+
+// used registerInstance here because we already have a singleton defined in lib/cache/init.ts
+container.registerInstance(TOKENS.CacheProvider, cacheProvider);
 
 export { container };

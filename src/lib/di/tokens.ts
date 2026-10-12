@@ -21,4 +21,5 @@ export const TOKENS = {
 
     // lib/infrastructure
     Logger: Symbol.for('Logger'),
+    CacheProvider: Symbol.for('CacheProvider'),
 };

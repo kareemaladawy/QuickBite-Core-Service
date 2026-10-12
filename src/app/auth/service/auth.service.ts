@@ -73,6 +73,10 @@ export class AuthService {
 
             await transaction.commit();
 
+            if (data.role === SystemRole.RESTAURANT_USER) {
+                await this.restaurantService.invalidateRestaurantsListCache();
+            }
+
             restaurantMemberInfo = await this.generateRestaurantMemberInfoPayload(user);
         } catch (error) {
             await transaction.rollback();

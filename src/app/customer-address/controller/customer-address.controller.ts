@@ -16,7 +16,7 @@ export class CustomerAddressController {
         try {
             const addresses = await this.customerAddressService.listUserCustomerAddresses(req.user?.userId);
 
-            return sendSuccess(res, addresses);
+            sendSuccess(res, addresses);
         } catch (error) {
             next(error);
         }
@@ -27,7 +27,7 @@ export class CustomerAddressController {
             const validated = await validateBody(CreateCustomerAddressDto, req.body);
             const address = await this.customerAddressService.createCustomerAddress(req.user?.userId, validated);
 
-            return sendCreated(res, address);
+            sendCreated(res, address);
         } catch (error) {
             next(error);
         }
@@ -38,7 +38,7 @@ export class CustomerAddressController {
             const validated = await validateBody(UpdateCustomerAddressDto, req.body);
             await this.customerAddressService.updateCustomerAddress(req.params.id, req.user?.userId, validated);
 
-            return sendSuccess(res, { message: "Address updated" });
+            sendSuccess(res, { message: "Address updated" });
         } catch (error) {
             next(error);
         }
@@ -48,7 +48,7 @@ export class CustomerAddressController {
         try {
             await this.customerAddressService.deleteCustomerAddress(req.params.id, req.user?.userId);
 
-            return sendNoContent(res);
+            sendNoContent(res);
         } catch (error) {
             next(error);
         }

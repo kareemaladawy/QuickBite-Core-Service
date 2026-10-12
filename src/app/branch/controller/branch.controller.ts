@@ -20,7 +20,7 @@ export class BranchController {
                 Number(req.params.restaurantId)
             );
 
-            return sendSuccess(res, branches);
+            sendSuccess(res, branches);
         } catch (error) {
             next(error);
         }
@@ -32,7 +32,7 @@ export class BranchController {
                 Number(req.params.branchId)
             );
 
-            return sendSuccess(res, branch);
+            sendSuccess(res, branch);
         } catch (error) {
             next(error);
         }
@@ -45,7 +45,7 @@ export class BranchController {
                 Number(req.query.long),
             );
 
-            return sendSuccess(res, branches);
+            sendSuccess(res, branches);
         } catch (error) {
             next(error);
         }
@@ -58,7 +58,7 @@ export class BranchController {
             const validated = await validateBody(CreateBranchDTO, req.body);
             const branch = await this.branchService.createBranch(restaurantId, userId, validated);
 
-            return sendCreated(res, branch);
+            sendCreated(res, branch);
         } catch (error) {
             next(error);
         }
@@ -70,7 +70,7 @@ export class BranchController {
             const validated = await validateBody(UpdateBranchDetailsDTO, req.body);
             await this.branchService.updateBranchDetails(branchId, validated);
 
-            return sendSuccess(res, { message: "Branch details updated" });
+            sendSuccess(res, { message: "Branch details updated" });
         } catch (error) {
             next(error);
         }
@@ -88,7 +88,7 @@ export class BranchController {
             const validated = await validateBody(UpdateBranchStatusDTO, req.body);
             await this.branchService.updateBranchStatus(branchId, validated);
 
-            return sendSuccess(res, { message: "Branch status updated" });
+            sendSuccess(res, { message: "Branch status updated" });
         } catch (error) {
             next(error);
         }

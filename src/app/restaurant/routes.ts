@@ -4,12 +4,13 @@ import { rbac, requireRestaurantMember } from "../../lib/auth/middleware/rbac";
 import { container } from "../../lib/di/container";
 import { TOKENS } from "../../lib/di/tokens";
 import { RestaurantController } from "./controller/restaurant.controller";
+import { withCache } from "../../lib/cache/middleware/withCache";
 
 export const restaurantRouter = Router();
 
 const restaurantController = container.resolve<RestaurantController>(TOKENS.RestaurantController);
 
-restaurantRouter.get('/', restaurantController.getRestaurants);
+restaurantRouter.get('/', withCache(), restaurantController.getRestaurants);
 restaurantRouter.get('/:id', restaurantController.findRestaurantById);
 
 restaurantRouter.patch(
