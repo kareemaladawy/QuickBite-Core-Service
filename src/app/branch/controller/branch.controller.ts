@@ -1,18 +1,17 @@
 import { NextFunction, Request, Response } from "express";
 import { BranchService } from "../service/branch.service";
-import { RestaurantService } from "../../restaurant/service/restaurant.service";
 import { SystemRole } from "../../user/enums";
 import { CreateBranchDTO, UpdateBranchDetailsDTO, UpdateBranchStatusDTO } from "../dto/branch.dto";
 import { validateBody } from "../../../lib/validation/validate";
 import { UnauthorizedError } from "../errors";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
+import { sendCreated, sendSuccess } from "../../../lib/http/response";
 
 @injectable()
 export class BranchController {
     constructor(
         @inject(TOKENS.BranchService) private readonly branchService: BranchService,
-        @inject(TOKENS.RestaurantService) private readonly restaurantService: RestaurantService
     ) { }
 
     listBranchesByRestaurantId = async (req: Request, res: Response, next: NextFunction) => {
@@ -21,9 +20,7 @@ export class BranchController {
                 Number(req.params.restaurantId)
             );
 
-            return res.status(200).json({
-                data: branches
-            });
+            return sendSuccess(res, branches);
         } catch (error) {
             next(error);
         }
@@ -35,9 +32,7 @@ export class BranchController {
                 Number(req.params.branchId)
             );
 
-            return res.status(200).json({
-                data: branch
-            });
+            return sendSuccess(res, branch);
         } catch (error) {
             next(error);
         }
@@ -50,9 +45,7 @@ export class BranchController {
                 Number(req.query.long),
             );
 
-            return res.status(200).json({
-                data: branches
-            });
+            return sendSuccess(res, branches);
         } catch (error) {
             next(error);
         }
@@ -61,20 +54,11 @@ export class BranchController {
     createBranch = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = Number(req.user?.userId);
-            const userRole = req.user?.role as SystemRole;
             const restaurantId = Number(req.params.restaurantId);
-            const restaurant = await this.restaurantService.findRestaurantById(restaurantId);
-
-            if (!(userRole == SystemRole.RESTAURANT_USER && userId == restaurant.ownerId
-                || userRole == SystemRole.SYSTEM_ADMIN)
-            ) {
-                throw UnauthorizedError;
-            }
-
             const validated = await validateBody(CreateBranchDTO, req.body);
             const branch = await this.branchService.createBranch(restaurantId, userId, validated);
 
-            res.status(201).json(branch);
+            return sendCreated(res, branch);
         } catch (error) {
             next(error);
         }
@@ -82,22 +66,11 @@ export class BranchController {
 
     updateBranchDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = Number(req.user?.userId);
-            const userRole = req.user?.role as SystemRole;
             const branchId = Number(req.params.branchId);
-            const branch = await this.branchService.findBranchById(branchId);
-            const restaurant = await this.restaurantService.findRestaurantById(branch.restaurantId);
-
-            if (!(userRole == SystemRole.RESTAURANT_USER && userId == restaurant.ownerId
-                || userRole == SystemRole.SYSTEM_ADMIN)
-            ) {
-                throw UnauthorizedError;
-            }
-
             const validated = await validateBody(UpdateBranchDetailsDTO, req.body);
             await this.branchService.updateBranchDetails(branchId, validated);
 
-            res.status(200).send();
+            return sendSuccess(res, { message: "Branch details updated" });
         } catch (error) {
             next(error);
         }
@@ -115,7 +88,7 @@ export class BranchController {
             const validated = await validateBody(UpdateBranchStatusDTO, req.body);
             await this.branchService.updateBranchStatus(branchId, validated);
 
-            res.status(200).send();
+            return sendSuccess(res, { message: "Branch status updated" });
         } catch (error) {
             next(error);
         }

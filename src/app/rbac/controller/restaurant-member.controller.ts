@@ -6,6 +6,7 @@ import { PermissionDeniedError } from "../../../lib/auth/errors";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
 import { MemberBranchCacheService } from "../service/member-branch-cache.service";
+import { sendCreated, sendNoContent, sendSuccess } from "../../../lib/http/response";
 
 @injectable()
 export class RestaurantMemberController {
@@ -18,7 +19,7 @@ export class RestaurantMemberController {
         try {
             const members = await this.restaurantMemberService.listMembers(Number(req.params.restaurantId));
 
-            return res.status(200).json({ data: members });
+            return sendSuccess(res, members);
         } catch (error) {
             next(error);
         }
@@ -42,7 +43,7 @@ export class RestaurantMemberController {
                 validated
             );
 
-            return res.status(201).json({ data: member });
+            return sendCreated(res, member);
         } catch (error) {
             next(error);
         }
@@ -58,7 +59,7 @@ export class RestaurantMemberController {
                 validated
             );
 
-            return res.status(200).send();
+            return sendSuccess(res, { message: "Member updated" });
         } catch (error) {
             next(error);
         }
@@ -74,7 +75,7 @@ export class RestaurantMemberController {
                 validated.branchIds
             );
 
-            return res.status(200).send();
+            return sendSuccess(res, { message: "Member branches updated" });
         } catch (error) {
             next(error);
         }
@@ -87,7 +88,7 @@ export class RestaurantMemberController {
                 Number(req.params.memberId)
             );
 
-            return res.status(204).send();
+            return sendNoContent(res);
         } catch (error) {
             next(error);
         }
@@ -98,10 +99,7 @@ export class RestaurantMemberController {
             const roleName = req.params.roleName as string;
             const permissions = await this.restaurantMemberService.getRolePermissions(roleName);
 
-            return res.status(200).json({
-                role: roleName,
-                permissions
-            });
+            return sendSuccess(res, { role: roleName, permissions });
         } catch (error) {
             next(error);
         }

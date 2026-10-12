@@ -22,6 +22,7 @@ branchRouter.patch(
     '/branches/:branchId',
     authenticate,
     requireBranchAccess('branchId'),
+    rbac({ resource: 'core:branch', action: 'update' }),
     branchController.updateBranchDetails
 );
 

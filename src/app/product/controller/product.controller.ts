@@ -5,6 +5,7 @@ import { CreateProductDTO, UpdateProductDTO } from "../dto/product.dto";
 import { ProductService } from "../service/product.service";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
+import { sendCreated, sendSuccess } from "../../../lib/http/response";
 
 @injectable()
 export class ProductController {
@@ -18,7 +19,7 @@ export class ProductController {
                 data,
             );
 
-            res.status(201).json({ data: product });
+            return sendCreated(res, product);
         } catch (error) {
             next(error);
         }
@@ -32,7 +33,7 @@ export class ProductController {
                 req.user?.role! as SystemRole,
             );
 
-            res.status(200).json({ data: products });
+            return sendSuccess(res, products);
         } catch (error) {
             next(error);
         }
@@ -40,9 +41,9 @@ export class ProductController {
 
     findCategories = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const products = await this.productService.findCategories(Number(req.params.restaurantId));
+            const categories = await this.productService.findCategories(Number(req.params.restaurantId));
 
-            res.status(200).json({ data: products });
+            return sendSuccess(res, categories);
         } catch (error) {
             next(error);
         }
@@ -52,7 +53,7 @@ export class ProductController {
         try {
             const results = await this.productService.findByBranch(Number(req.params.branchId));
 
-            res.status(200).json({ data: results });
+            return sendSuccess(res, results);
         } catch (error) {
             next(error);
         }
@@ -62,7 +63,7 @@ export class ProductController {
         try {
             const product = await this.productService.findById(Number(req.params.id));
 
-            res.status(200).json({ data: product });
+            return sendSuccess(res, product);
         } catch (error) {
             next(error);
         }
@@ -81,7 +82,7 @@ export class ProductController {
                 branchId,
             );
 
-            res.status(200).send();
+            return sendSuccess(res, { message: "Product updated" });
         } catch (error) {
             next(error);
         }

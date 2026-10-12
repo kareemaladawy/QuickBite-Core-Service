@@ -6,6 +6,7 @@ import { NotAuthenticatedError } from "../../../lib/auth/errors";
 import { setTokenCookies } from "../../../lib/auth/helpers";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
+import { sendCreated, sendSuccess } from "../../../lib/http/response";
 
 @injectable()
 export class AuthController {
@@ -18,7 +19,7 @@ export class AuthController {
 
             setTokenCookies(result.accessToken, result.refreshToken, res);
 
-            return res.status(201).json(result);
+            return sendCreated(res, result);
         } catch (error) {
             next(error);
         }
@@ -31,7 +32,7 @@ export class AuthController {
 
             setTokenCookies(result.accessToken, result.refreshToken, res);
 
-            return res.status(200).json(result);
+            return sendSuccess(res, result);
         } catch (error) {
             next(error);
         }
@@ -49,7 +50,7 @@ export class AuthController {
 
             setTokenCookies(result.accessToken, result.refreshToken, res);
 
-            return res.status(200).json(result);
+            return sendSuccess(res, result);
         } catch (error) {
             next(error);
         }
@@ -60,7 +61,7 @@ export class AuthController {
             const validated = await validateBody(ForgetPasswordDTO, req.body);
             await this.authService.forgetPassword(validated);
 
-            return res.status(200).json({ message: "An email was sent to you if your email is registered" });
+            return sendSuccess(res, { message: "An email was sent to you if your email is registered" });
         } catch (error) {
             next(error);
         }
@@ -71,7 +72,7 @@ export class AuthController {
             const validated = await validateBody(ResetPasswordDTO, req.body);
             await this.authService.resetPassword(validated);
 
-            return res.status(200).json({ message: "Your password was reset" });
+            return sendSuccess(res, { message: "Your password was reset" });
         } catch (error) {
             next(error);
         }
@@ -82,7 +83,7 @@ export class AuthController {
             const validated = await validateBody(ResetPasswordDTO, req.body);
             await this.authService.acceptInvite(validated);
 
-            return res.status(200).json({ message: "Your invitation was accepted" });
+            return sendSuccess(res, { message: "Your invitation was accepted" });
         } catch (error) {
             next(error);
         }

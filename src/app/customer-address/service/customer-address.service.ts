@@ -21,9 +21,7 @@ export class CustomerAddressService {
     }
 
     updateCustomerAddress: any = async (id: number, userId: number, addressData: any) => {
-        const address = await updateCustomerAddress(id, userId, addressData);
-
-        return address;
+        await updateCustomerAddress(id, userId, addressData);
     }
 
     deleteCustomerAddress: any = async (id: number, userId: number) => {

@@ -1,15 +1,20 @@
-import { injectable } from "tsyringe";
+import { inject, injectable } from "tsyringe";
 import { NoMemberProfileFound } from "../../auth/errors";
 import { addMemberBranch } from "../../rbac/repository/member-branch.repo";
 import { findRestaurantMemberWithRoleName } from "../../rbac/repository/restaurant-member.repo";
-import { memberBranchCacheService } from "../../rbac/service/member-branch-cache.service";
 import { CreateBranchDTO, UpdateBranchDetailsDTO, UpdateBranchStatusDTO } from "../dto/branch.dto";
 import { Branch } from "../entity/branch.entity";
 import { BranchNotFoundError } from "../errors";
 import { createBranch, findBranchById, findNearbyBranches, listBranchesByRestaurantId, updateBranchDetails, updateBranchStatus } from "../repository/branch.repo";
+import { TOKENS } from "../../../lib/di/tokens";
+import { MemberBranchCacheService } from "../../rbac/service/member-branch-cache.service";
 
 @injectable()
 export class BranchService {
+    constructor(
+        @inject(TOKENS.MemberBranchCacheService) private readonly memberBranchCacheService: MemberBranchCacheService
+    ) { }
+
     createBranch: any = async (restaurantId: number, ownerId: number, data: CreateBranchDTO): Promise<Branch> => {
         const now = new Date();
         const branch = await createBranch(new Branch({
@@ -36,7 +41,7 @@ export class BranchService {
         }
 
         await addMemberBranch(memberData.member.id, branch.id);
-        memberBranchCacheService.invalidate(ownerId);
+        this.memberBranchCacheService.invalidate(ownerId);
 
         return branch;
     }

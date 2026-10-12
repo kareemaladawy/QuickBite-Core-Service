@@ -4,6 +4,7 @@ import { validateBody } from "../../../lib/validation/validate";
 import { CreateCustomerAddressDto, UpdateCustomerAddressDto } from "../dto/customer-address.dto";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
+import { sendCreated, sendNoContent, sendSuccess } from "../../../lib/http/response";
 
 @injectable()
 export class CustomerAddressController {
@@ -15,9 +16,7 @@ export class CustomerAddressController {
         try {
             const addresses = await this.customerAddressService.listUserCustomerAddresses(req.user?.userId);
 
-            return res.status(200).json({
-                data: addresses
-            });
+            return sendSuccess(res, addresses);
         } catch (error) {
             next(error);
         }
@@ -28,9 +27,7 @@ export class CustomerAddressController {
             const validated = await validateBody(CreateCustomerAddressDto, req.body);
             const address = await this.customerAddressService.createCustomerAddress(req.user?.userId, validated);
 
-            return res.status(201).json({
-                data: address
-            });
+            return sendCreated(res, address);
         } catch (error) {
             next(error);
         }
@@ -39,11 +36,9 @@ export class CustomerAddressController {
     updateCustomerAddress: any = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const validated = await validateBody(UpdateCustomerAddressDto, req.body);
-            const address = await this.customerAddressService.updateCustomerAddress(req.params.id, req.user?.userId, validated);
+            await this.customerAddressService.updateCustomerAddress(req.params.id, req.user?.userId, validated);
 
-            return res.status(200).json({
-                data: address
-            });
+            return sendSuccess(res, { message: "Address updated" });
         } catch (error) {
             next(error);
         }
@@ -53,7 +48,7 @@ export class CustomerAddressController {
         try {
             await this.customerAddressService.deleteCustomerAddress(req.params.id, req.user?.userId);
 
-            return res.status(204).send();
+            return sendNoContent(res);
         } catch (error) {
             next(error);
         }
