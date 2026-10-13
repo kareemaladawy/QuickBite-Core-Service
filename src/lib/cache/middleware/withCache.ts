@@ -24,8 +24,10 @@ export function withCache(ttl = hours(1), userScoped = false) {
 
             res.json = (body: any) => {
                 // store the intercepted response in the cache
-                cacheProvider.set(key, JSON.stringify(body), ttl);
-                res.setHeader('X-Cache', 'MISS');
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                    cacheProvider.set(key, JSON.stringify(body), ttl);
+                    res.setHeader('X-Cache', 'MISS');
+                }
                 // return the original response
                 return originalResponse(body);
             }

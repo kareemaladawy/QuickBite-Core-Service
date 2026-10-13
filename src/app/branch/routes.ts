@@ -13,7 +13,7 @@ const branchController = container.resolve<BranchController>(TOKENS.BranchContro
 
 branchRouter.get(
     '/branches/nearby',
-    withCache(hours(1)),
+    // withCache(hours(1)),
     branchController.findNearbyBranches
 );
 

@@ -10,7 +10,12 @@ export const restaurantRouter = Router();
 
 const restaurantController = container.resolve<RestaurantController>(TOKENS.RestaurantController);
 
-restaurantRouter.get('/', withCache(), restaurantController.getRestaurants);
+restaurantRouter.get(
+    '/',
+    withCache(),
+    restaurantController.getRestaurants
+
+);
 restaurantRouter.get('/:id', restaurantController.findRestaurantById);
 
 restaurantRouter.patch(

@@ -9,6 +9,7 @@ import { RestaurantMemberService } from "../../rbac/service/restaurant-member.se
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
 import { ICacheProvider } from "../../../pkg/utils/cache/cache.interface";
+import { buildPaginationResult, FilterParams, PaginationParams } from "../../../lib/http/pagination/cursor-pagination";
 
 // mirrors the key withCache() derives for GET /api/v1/restaurants (no query params, so it's a single fixed key)
 const RESTAURANTS_LIST_CACHE_KEYS = ["GET:/api/v1/restaurants", "GET:/api/v1/restaurants/"];
@@ -24,10 +25,10 @@ export class RestaurantService {
         await Promise.all(RESTAURANTS_LIST_CACHE_KEYS.map((key) => this.cacheProvider.del(key)));
     }
 
-    getRestaurants: any = async () => {
-        const restaurants = await getRestaurants();
+    getRestaurants: any = async (paginationParams: PaginationParams, filters: FilterParams[]) => {
+        const restaurants = await getRestaurants(paginationParams, filters);
 
-        return restaurants;
+        return buildPaginationResult(restaurants, paginationParams.limit, paginationParams.sortBy);
     }
 
     findRestaurantById = async (id: number) => {
