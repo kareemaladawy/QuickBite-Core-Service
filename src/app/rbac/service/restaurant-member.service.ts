@@ -21,6 +21,9 @@ import { UserService } from "../../user/service/user.service";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
 import { MemberBranchCacheService } from "./member-branch-cache.service";
+import { container } from "../../../lib/di/container";
+import { IEmailProvider } from "../../../pkg/utils/email/email.interface";
+import { MemberInvitationEmail } from "../templates/member-invitation.template";
 
 @injectable()
 export class RestaurantMemberService {
@@ -95,8 +98,6 @@ export class RestaurantMemberService {
             await setMemberBranches(member.id!, data.branchIds ?? [], transaction);
             this.memberBranchCacheService.invalidate(user.id!);
 
-            // generate otp, password reset record, mock email send
-
             const otp = await generateOTP();
             const otpHash = await hashOTP(otp);
 
@@ -106,7 +107,9 @@ export class RestaurantMemberService {
                 expiresAt: new Date(Date.now() + toMs(15, 'm'))
             }), transaction);
 
-            console.log("Mock email sent: ", otp);
+            const emailProvider = container.resolve<IEmailProvider>(TOKENS.EmailProvider);
+            const email = MemberInvitationEmail(otp, data.name);
+            await emailProvider.sendEmail(user.email, email.subject, email.html);
 
             await transaction.commit();
 

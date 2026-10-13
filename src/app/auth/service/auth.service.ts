@@ -15,6 +15,9 @@ import { activateRestaurantMember, findRestaurantMemberWithRoleName } from "../.
 import { UserService } from "../../user/service/user.service";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
+import { container } from "../../../lib/di/container";
+import { IEmailProvider } from "../../../pkg/utils/email/email.interface";
+import { PasswordResetEmail } from "../templates/password-reset.template";
 
 @injectable()
 export class AuthService {
@@ -199,7 +202,9 @@ export class AuthService {
             expiresAt: new Date(Date.now() + toMs(5, 'm')),
         }));
 
-        console.log(`Mocked email sent ${otp}`);
+        const emailProvider = container.resolve<IEmailProvider>(TOKENS.EmailProvider);
+        const email = PasswordResetEmail(otp, user.name);
+        await emailProvider.sendEmail(user.email, email.subject, email.html);
     }
 
     resetPassword: any = async (data: ResetPasswordDTO) => {

@@ -25,6 +25,11 @@ const schema = z.object({
     NODE_ENV: z.enum(['local', 'development', 'production']),
     ACCESS_EXPIRES_IN_MS: z.string().default("3600000"),
     CORS_ORIGINS: z.string().default("http://localhost:3000"),
+
+    MAILJET_FROM_NAME: z.string(),
+    MAILJET_FROM_EMAIL: z.string(),
+    MAILJET_API_KEY: z.string(),
+    MAILJET_API_SECRET: z.string(),
 })
 
 const parsed = schema.parse(process.env);
@@ -57,5 +62,11 @@ export const env = {
     },
     cors: {
         origins: parsed.CORS_ORIGINS.split(',')
+    },
+    mailjet: {
+        fromName: parsed.MAILJET_FROM_NAME,
+        fromEmail: parsed.MAILJET_FROM_EMAIL,
+        apiKey: parsed.MAILJET_API_KEY,
+        apiSecret: parsed.MAILJET_API_SECRET
     }
 }
