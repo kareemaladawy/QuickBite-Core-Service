@@ -94,7 +94,8 @@ export async function updateBranchDetails(branchId: number, data: UpdateBranchDe
 
 export async function findNearbyBranches(lat: number, long: number): Promise<Branch[]> {
     const result = await db.raw(`
-        SELECT b.*, r.name, r.logo_url 
+        SELECT b.label, b.address_text, b.opens_at, b.closes_at, b.accepts_orders, b.country_code, b.currency,
+        r.name as restaurant_name, r.logo_url as restaurant_logo_url 
         FROM branches b join restaurants r on b.restaurant_id = r.id
         WHERE b.is_active = true AND b.accepts_orders = true AND r.status = ?
         AND ST_DWithin(b.location, ST_MakePoint(?::float, ?::float), b.delivery_radius*1000)
@@ -104,7 +105,19 @@ export async function findNearbyBranches(lat: number, long: number): Promise<Bra
         lat
     ]);
 
-    return result.rows.map(toEntity);
+    return result.rows.map((row: any) => {
+        return {
+            lable: row.label,
+            restaurantName: row.restaurant_name,
+            restaurantLogoUrl: row.restaurant_logo_url,
+            addressText: row.address_text,
+            opensAt: row.opens_at,
+            closesAt: row.closes_at,
+            acceptsOrders: row.accepts_orders,
+            countryCode: row.country_code,
+            currency: row.currency,
+        };
+    });
 }
 
 export async function listBranchesByRestaurantId(restaurantId: number): Promise<Branch[]> {
