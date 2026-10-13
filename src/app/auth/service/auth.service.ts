@@ -6,7 +6,7 @@ import { PasswordReset } from "../entity/password-reset.entity";
 import { IncorrectLoginCredentials, IncorrectOTP, NoMemberProfileFound, PasswordResetAttemptExpired, RestaurantDataRequiredError, SystemAdminCannotRegisterError } from "../errors";
 import { createPasswordReset, findLatestPasswordResetAttemptByUserId, setPasswordResetConsumedAt } from "../repository/password-reset.repo";
 import { comparePasswordHash, generateAccessToken, generateOTP, generateRefreshToken, hashOTP, verifyRefreshToken } from "../utils";
-import { minutes } from "../../../pkg/utils/time";
+import { toMs } from "../../../pkg/utils/time";
 import { NotAuthenticatedError } from "../../../lib/auth/errors";
 import { RestaurantService } from "../../restaurant/service/restaurant.service";
 import { db } from "../../../lib/knex/knex";
@@ -196,7 +196,7 @@ export class AuthService {
         await createPasswordReset(new PasswordReset({
             userId: user.id,
             otpHash: otpHash,
-            expiresAt: new Date(Date.now() + minutes(5)),
+            expiresAt: new Date(Date.now() + toMs(5, 'm')),
         }));
 
         console.log(`Mocked email sent ${otp}`);

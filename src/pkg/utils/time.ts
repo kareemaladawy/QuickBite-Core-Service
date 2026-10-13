@@ -1,8 +1,3 @@
-export const seconds = (n: number) => n * 1000;
-export const minutes = (n: number) => n * seconds(60);
-export const hours = (n: number) => n * minutes(60);
-export const days = (n: number) => n * hours(24);
-
 type timeUnit = 'h' | 'm' | 's' | 'd';
 
 const multipliers: Record<timeUnit, number> = {
@@ -14,4 +9,8 @@ const multipliers: Record<timeUnit, number> = {
 
 export const toMs = (n: number, unit: timeUnit) => {
     return n * multipliers[unit];
+}
+
+export const toSeconds = (n: number, unit: timeUnit) => {
+    return toMs(n, unit) / 1000;
 }

@@ -1,11 +1,11 @@
 import { injectable } from "tsyringe";
-import { hours } from "../../../pkg/utils/time";
+import { toMs } from "../../../pkg/utils/time";
 import { findMemberBranchIdsByUserId } from "../repository/member-branch.repo";
 
 @injectable()
 export class MemberBranchCacheService {
     private cache: Map<number, { branchIds: number[], cachedAt: number }> = new Map();
-    private readonly TTL = hours(7);
+    private readonly TTL = toMs(7, 'h');
 
     async getBranchIdsByUserId(userId: number): Promise<number[]> {
         const cached = this.cache.get(userId);

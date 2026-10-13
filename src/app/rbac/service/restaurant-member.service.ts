@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 import { db } from "../../../lib/knex/knex";
-import { minutes } from "../../../pkg/utils/time";
+import { toMs } from "../../../pkg/utils/time";
 import { PasswordReset } from "../../auth/entity/password-reset.entity";
 import { createPasswordReset } from "../../auth/repository/password-reset.repo";
 import { generateOTP, hashOTP } from "../../auth/utils";
@@ -103,7 +103,7 @@ export class RestaurantMemberService {
             await createPasswordReset(new PasswordReset({
                 userId: user.id,
                 otpHash: otpHash,
-                expiresAt: new Date(Date.now() + minutes(15))
+                expiresAt: new Date(Date.now() + toMs(15, 'm'))
             }), transaction);
 
             console.log("Mock email sent: ", otp);

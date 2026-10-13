@@ -5,7 +5,7 @@ import { container } from "../../lib/di/container";
 import { TOKENS } from "../../lib/di/tokens";
 import { BranchController } from "./controller/branch.controller";
 import { withCache } from "../../lib/cache/middleware/withCache";
-import { hours } from "../../pkg/utils/time";
+import { toMs } from "../../pkg/utils/time";
 
 export const branchRouter = Router();
 
@@ -13,7 +13,7 @@ const branchController = container.resolve<BranchController>(TOKENS.BranchContro
 
 branchRouter.get(
     '/branches/nearby',
-    // withCache(hours(1)),
+    withCache(toMs(1, 'h')),
     branchController.findNearbyBranches
 );
 
