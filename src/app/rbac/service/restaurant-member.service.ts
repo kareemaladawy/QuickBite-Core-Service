@@ -21,14 +21,14 @@ import { UserService } from "../../user/service/user.service";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
 import { MemberBranchCacheService } from "./member-branch-cache.service";
-import { container } from "../../../lib/di/container";
-import { IEmailProvider } from "../../../pkg/utils/email/email.interface";
 import { MemberInvitationEmail } from "../templates/member-invitation.template";
+import { MailjetEmailProvider } from "../../../pkg/utils/email/mailjet";
 
 @injectable()
 export class RestaurantMemberService {
     constructor(
         @inject(TOKENS.UserService) private readonly userService: UserService,
+        @inject(TOKENS.EmailProvider) private readonly emailProvider: MailjetEmailProvider,
         @inject(TOKENS.MemberBranchCacheService) private readonly memberBranchCacheService: MemberBranchCacheService,
     ) { }
 
@@ -107,9 +107,8 @@ export class RestaurantMemberService {
                 expiresAt: new Date(Date.now() + toMs(15, 'm'))
             }), transaction);
 
-            const emailProvider = container.resolve<IEmailProvider>(TOKENS.EmailProvider);
             const email = MemberInvitationEmail(otp, data.name);
-            await emailProvider.sendEmail(user.email, email.subject, email.html);
+            await this.emailProvider.sendEmail(user.email, email.subject, email.html);
 
             await transaction.commit();
 
