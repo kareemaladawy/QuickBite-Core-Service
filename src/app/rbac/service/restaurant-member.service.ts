@@ -22,13 +22,13 @@ import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
 import { MemberBranchCacheService } from "./member-branch-cache.service";
 import { MemberInvitationEmail } from "../templates/member-invitation.template";
-import { MailjetEmailProvider } from "../../../pkg/utils/email/mailjet";
+import { IEmailProvider } from "../../../pkg/utils/email/email.interface";
 
 @injectable()
 export class RestaurantMemberService {
     constructor(
         @inject(TOKENS.UserService) private readonly userService: UserService,
-        @inject(TOKENS.EmailProvider) private readonly emailProvider: MailjetEmailProvider,
+        @inject(TOKENS.EmailProvider) private readonly emailProvider: IEmailProvider,
         @inject(TOKENS.MemberBranchCacheService) private readonly memberBranchCacheService: MemberBranchCacheService,
     ) { }
 

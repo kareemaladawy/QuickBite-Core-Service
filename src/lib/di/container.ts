@@ -18,7 +18,7 @@ import { RestaurantMemberController } from '../../app/rbac/controller/restaurant
 import { RestaurantController } from '../../app/restaurant/controller/restaurant.controller';
 import { UserController } from '../../app/user/controller/user.controller';
 import { cacheProvider } from '../cache/init';
-import { EmailProvider } from '../email/init';
+import { emailProvider } from '../email/init';
 
 // Services
 container.registerSingleton(TOKENS.AuthService, AuthService);
@@ -45,6 +45,6 @@ container.registerSingleton(TOKENS.Logger, Logger);
 
 // used registerInstance here because we already have a singleton defined in lib/cache/init.ts
 container.registerInstance(TOKENS.CacheProvider, cacheProvider);
-container.registerInstance(TOKENS.EmailProvider, EmailProvider);
+container.registerInstance(TOKENS.EmailProvider, emailProvider);
 
 export { container };

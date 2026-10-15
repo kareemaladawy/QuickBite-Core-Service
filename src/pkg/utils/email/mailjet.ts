@@ -1,6 +1,5 @@
 import Mailjet from "node-mailjet";
 import { IEmailProvider } from "./email.interface";
-import { injectable } from "tsyringe";
 
 export interface MailjetEmailProviderConfig {
     fromName: string;
@@ -9,7 +8,6 @@ export interface MailjetEmailProviderConfig {
     apiSecret: string;
 }
 
-@injectable()
 export class MailjetEmailProvider implements IEmailProvider {
     constructor(private config: MailjetEmailProviderConfig) { }
 

@@ -16,14 +16,14 @@ import { UserService } from "../../user/service/user.service";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
 import { PasswordResetEmail } from "../templates/password-reset.template";
-import { MailjetEmailProvider } from "../../../pkg/utils/email/mailjet";
+import { IEmailProvider } from "../../../pkg/utils/email/email.interface";
 
 @injectable()
 export class AuthService {
     constructor(
         @inject(TOKENS.UserService) private readonly userService: UserService,
         @inject(TOKENS.RestaurantService) private readonly restaurantService: RestaurantService,
-        @inject(TOKENS.EmailProvider) private readonly emailProvider: MailjetEmailProvider
+        @inject(TOKENS.EmailProvider) private readonly emailProvider: IEmailProvider
     ) { }
 
     generateRestaurantMemberInfoPayload: any = async (user: User) => {
