@@ -19,6 +19,7 @@ const branchColumns = [
     "country_code",
     "delivery_radius",
     "commission_percentage",
+    "delivery_fee",
     "created_at",
     "updated_at",
 ];
@@ -39,6 +40,7 @@ function toEntity(row: any): Branch {
         countryCode: row.country_code,
         deliveryRadius: row.delivery_radius,
         commissionPercentage: row.commission_percentage,
+        deliveryFee: row.delivery_fee,
         createdAt: row.created_at,
         updatedAt: row.updated_at
     });

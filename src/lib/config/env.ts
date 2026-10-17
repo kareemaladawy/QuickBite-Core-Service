@@ -30,6 +30,13 @@ const schema = z.object({
     MAILJET_FROM_EMAIL: z.string(),
     MAILJET_API_KEY: z.string(),
     MAILJET_API_SECRET: z.string(),
+
+    INTERNAL_API_KEY: z.string(),
+
+    RABBITMQ_URL: z.string(),
+    RABBITMQ_CORE_EVENTS_EXCHANGE: z.string().default("core.events"),
+    OUTBOX_DRAIN_CRON: z.string().default("*/10 * * * * *"),
+    OUTBOX_BATCH_SIZE: z.string().default("50"),
 })
 
 const parsed = schema.parse(process.env);
@@ -68,5 +75,16 @@ export const env = {
         fromEmail: parsed.MAILJET_FROM_EMAIL,
         apiKey: parsed.MAILJET_API_KEY,
         apiSecret: parsed.MAILJET_API_SECRET
-    }
+    },
+    internal: {
+        apiKey: parsed.INTERNAL_API_KEY,
+    },
+    rabbitmq: {
+        url: parsed.RABBITMQ_URL,
+        coreEventsExchange: parsed.RABBITMQ_CORE_EVENTS_EXCHANGE,
+    },
+    outbox: {
+        drainCron: parsed.OUTBOX_DRAIN_CRON,
+        batchSize: Number(parsed.OUTBOX_BATCH_SIZE),
+    },
 }

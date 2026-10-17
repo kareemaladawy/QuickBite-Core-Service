@@ -15,6 +15,7 @@ export class Branch {
     acceptsOrders: boolean;
     deliveryRadius: number;
     commissionPercentage: number;
+    deliveryFee: number;
     createdAt: Date;
     updatedAt: Date;
 
@@ -33,6 +34,7 @@ export class Branch {
         this.countryCode = data.countryCode!;
         this.deliveryRadius = data.deliveryRadius ?? 0;
         this.commissionPercentage = data.commissionPercentage ?? 0;
+        this.deliveryFee = data.deliveryFee ?? 0;
         this.createdAt = data.createdAt!;
         this.updatedAt = data.updatedAt!;
     }
