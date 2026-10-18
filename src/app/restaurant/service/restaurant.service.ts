@@ -8,11 +8,11 @@ import { UpdateRestaurantDto } from "../dto/restaurant.dto";
 import { RestaurantMemberService } from "../../rbac/service/restaurant-member.service";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
-import { ICacheProvider } from "../../../pkg/utils/cache/cache.interface";
 import { buildPaginationResult, FilterParams, PaginationParams } from "../../../lib/http/pagination/cursor-pagination";
 import { db } from "../../../lib/knex/knex";
 import { insertOutboxEvent } from "../../../lib/events/outbox.repo";
 import { CoreEventType } from "../../../lib/events/event-types";
+import { ICacheProvider } from "../../../pkg/cache/cache.interface";
 
 // mirrors the key withCache() derives for GET /api/v1/restaurants (no query params, so it's a single fixed key)
 const RESTAURANTS_LIST_CACHE_KEYS = ["GET:/api/v1/restaurants", "GET:/api/v1/restaurants/"];

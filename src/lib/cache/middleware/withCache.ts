@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { toMs } from "../../../pkg/utils/time";
 import { TOKENS } from "../../di/tokens";
 import { container } from "../../di/container";
-import { ICacheProvider } from "../../../pkg/utils/cache/cache.interface";
+import { ICacheProvider } from "../../../pkg/cache/cache.interface";
 
 export function withCache(ttl = toMs(1, 'h'), userScoped = false) {
     return async (req: Request, res: Response, next: NextFunction) => {

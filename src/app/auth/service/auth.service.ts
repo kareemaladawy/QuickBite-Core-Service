@@ -16,7 +16,7 @@ import { UserService } from "../../user/service/user.service";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
 import { PasswordResetEmail } from "../templates/password-reset.template";
-import { IEmailProvider } from "../../../pkg/utils/email/email.interface";
+import { IEmailProvider } from "../../../pkg/email/email.interface";
 
 @injectable()
 export class AuthService {

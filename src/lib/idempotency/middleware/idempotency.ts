@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { IdempotencyServiceUnavailable, MissingIdempotencyKeyError } from "../errors";
 import { TOKENS } from "../../di/tokens";
 import { container } from "tsyringe";
-import { ICacheProvider } from "../../../pkg/utils/cache/cache.interface";
 import { toSeconds } from "../../../pkg/utils/time";
+import { ICacheProvider } from "../../../pkg/cache/cache.interface";
 
 const TTL = toSeconds(1, 'd');
 

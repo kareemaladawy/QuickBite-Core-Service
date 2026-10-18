@@ -22,7 +22,7 @@ import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
 import { MemberBranchCacheService } from "./member-branch-cache.service";
 import { MemberInvitationEmail } from "../templates/member-invitation.template";
-import { IEmailProvider } from "../../../pkg/utils/email/email.interface";
+import { IEmailProvider } from "../../../pkg/email/email.interface";
 
 @injectable()
 export class RestaurantMemberService {

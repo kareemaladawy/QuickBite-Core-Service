@@ -1,4 +1,4 @@
-import { MailjetEmailProvider } from "../../pkg/utils/email/mailjet";
+import { MailjetEmailProvider } from "../../pkg/email/mailjet";
 import { env } from "../config/env";
 
 export const emailProvider = new MailjetEmailProvider({
