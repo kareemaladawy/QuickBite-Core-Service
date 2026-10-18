@@ -28,8 +28,8 @@ function toEntity(row: any): Product {
     });
 }
 
-export async function createProduct(data: Partial<Product>, conn: Knex = db): Promise<Product> {
-    const [row] = await conn("products").insert({
+export async function createProduct(data: Partial<Product>, transaction: Knex = db): Promise<Product> {
+    const [row] = await transaction("products").insert({
         name: data.name,
         description: data.description,
         image_url: data.imageUrl,
@@ -92,8 +92,8 @@ export async function findProductsByBranch(branchId: number) {
     }));
 }
 
-export async function updateProduct(id: number, data: Record<string, any>): Promise<Product> {
-    const [row] = await db("products").where("id", id).update({
+export async function updateProduct(id: number, data: Record<string, any>, transaction: Knex = db): Promise<Product> {
+    const [row] = await transaction("products").where("id", id).update({
         name: data.name,
         description: data.description,
         image_url: data.imageUrl,

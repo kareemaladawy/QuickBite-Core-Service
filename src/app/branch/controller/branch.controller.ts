@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { BranchService } from "../service/branch.service";
 import { SystemRole } from "../../user/enums";
 import { CreateBranchDTO, UpdateBranchDetailsDTO, UpdateBranchStatusDTO } from "../dto/branch.dto";
+import { BranchResponseDTO, NearbyBranchResponseDTO } from "../dto/branch.response.dto";
 import { validateBody } from "../../../lib/validation/validate";
 import { UnauthorizedError } from "../errors";
 import { inject, injectable } from "tsyringe";
@@ -20,7 +21,7 @@ export class BranchController {
                 Number(req.params.restaurantId)
             );
 
-            sendSuccess(res, branches);
+            sendSuccess(res, branches.map(BranchResponseDTO.from));
         } catch (error) {
             next(error);
         }
@@ -32,7 +33,7 @@ export class BranchController {
                 Number(req.params.branchId)
             );
 
-            sendSuccess(res, branch);
+            sendSuccess(res, BranchResponseDTO.from(branch));
         } catch (error) {
             next(error);
         }
@@ -45,7 +46,7 @@ export class BranchController {
                 Number(req.query.long),
             );
 
-            sendSuccess(res, branches);
+            sendSuccess(res, branches.map(NearbyBranchResponseDTO.from));
         } catch (error) {
             next(error);
         }
@@ -58,7 +59,7 @@ export class BranchController {
             const validated = await validateBody(CreateBranchDTO, req.body);
             const branch = await this.branchService.createBranch(restaurantId, userId, validated);
 
-            sendCreated(res, branch);
+            sendCreated(res, BranchResponseDTO.from(branch));
         } catch (error) {
             next(error);
         }

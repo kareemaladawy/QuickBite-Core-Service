@@ -8,6 +8,8 @@ import { findCategoryByName, findCategoriesByRestaurant, createCategory } from "
 import { updateBranchDetails } from "../repository/product-branch.repository";
 import { db } from "../../../lib/knex/knex";
 import { injectable } from "tsyringe";
+import { insertOutboxEvent } from "../../../lib/events/outbox.repo";
+import { CoreEventType } from "../../../lib/events/event-types";
 
 @injectable()
 export class ProductService {
@@ -77,31 +79,58 @@ export class ProductService {
         const restaurant = await findRestaurantById(product.restaurantId);
         if (!restaurant) throw RestaurantNotFoundError;
 
-        let categoryId: number | undefined = undefined;
-        if (data.categoryName) {
-            let category = await findCategoryByName(product.restaurantId, data.categoryName);
-            if (!category) {
-                category = await createCategory(product.restaurantId, data.categoryName);
+        const transaction = await db.transaction();
+
+        try {
+            let categoryId: number | undefined = undefined;
+            if (data.categoryName) {
+                let category = await findCategoryByName(product.restaurantId, data.categoryName);
+                if (!category) {
+                    category = await createCategory(product.restaurantId, data.categoryName, transaction);
+                }
+                categoryId = category.id;
             }
-            categoryId = category.id;
+
+            const updatedProduct = await updateProduct(productId, {
+                name: data.name,
+                description: data.description,
+                imageUrl: data.imageUrl,
+                categoryId,
+            }, transaction);
+
+            let branchDetails;
+            if (branchId && (data.price !== undefined || data.stock !== undefined || data.isAvailable !== undefined)) {
+                branchDetails = await updateBranchDetails(branchId, productId, {
+                    price: data.price,
+                    stock: data.stock,
+                    isAvailable: data.isAvailable,
+                }, transaction);
+
+                if (data.stock !== undefined) {
+                    await insertOutboxEvent(transaction, {
+                        aggregateType: "product_branch",
+                        aggregateId: productId,
+                        eventType: CoreEventType.PRODUCT_STOCK_CHANGED,
+                        payload: { productId, branchId, stock: data.stock },
+                    });
+                }
+
+                if (data.price !== undefined) {
+                    await insertOutboxEvent(transaction, {
+                        aggregateType: "product_branch",
+                        aggregateId: productId,
+                        eventType: CoreEventType.PRODUCT_PRICE_CHANGED,
+                        payload: { productId, branchId, price: data.price },
+                    });
+                }
+            }
+
+            await transaction.commit();
+
+            return { product: updatedProduct, branchDetails };
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
         }
-
-        const updatedProduct = await updateProduct(productId, {
-            name: data.name,
-            description: data.description,
-            imageUrl: data.imageUrl,
-            categoryId,
-        });
-
-        let branchDetails;
-        if (branchId && (data.price !== undefined || data.stock !== undefined || data.isAvailable !== undefined)) {
-            branchDetails = await updateBranchDetails(branchId, productId, {
-                price: data.price,
-                stock: data.stock,
-                isAvailable: data.isAvailable,
-            });
-        }
-
-        return { product: updatedProduct, branchDetails };
     }
 }

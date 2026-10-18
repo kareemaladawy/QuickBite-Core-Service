@@ -1,5 +1,6 @@
 import { Knex } from "knex";
 import { randomUUID } from "crypto";
+import { CoreEventType } from "./event-types";
 
 const outboxColumns = [
     "id",
@@ -14,7 +15,7 @@ const outboxColumns = [
 export interface OutboxEventInput {
     aggregateType: string;
     aggregateId: number;
-    eventType: string;
+    eventType: CoreEventType;
     payload: Record<string, unknown>;
 }
 
@@ -65,15 +66,34 @@ export async function claimUndispatchedEvents(transaction: Knex, limit: number):
     return rows.map(toEntity);
 }
 
-export async function markEventDispatched(transaction: Knex, id: number): Promise<void> {
+export async function markEventsDispatched(transaction: Knex, ids: number[]): Promise<void> {
+    if (ids.length === 0) return;
+
     await transaction("events_outbox")
-        .where("id", id)
+        .whereIn("id", ids)
         .update({ dispatched_at: new Date() });
 }
 
-export async function markEventFailed(transaction: Knex, id: number, error: string): Promise<void> {
-    await transaction("events_outbox")
-        .where("id", id)
-        .increment("attempts", 1)
-        .update({ last_error: error });
+export interface OutboxFailure {
+    id: number;
+    error: string;
+}
+
+// One UPDATE ... FROM (VALUES ...) for the whole batch instead of one query per failed event.
+export async function markEventsFailed(transaction: Knex, failures: OutboxFailure[]): Promise<void> {
+    if (failures.length === 0) return;
+
+    const values = failures.map((f) => `(?::bigint, ?::text)`).join(", ");
+    const bindings = failures.flatMap((f) => [f.id, f.error.slice(0, 2000)]);
+
+    await transaction.raw(
+        `
+        UPDATE events_outbox eo
+        SET attempts = eo.attempts + 1,
+            last_error = v.last_error
+        FROM (VALUES ${values}) AS v(id, last_error)
+        WHERE eo.id = v.id
+        `,
+        bindings
+    );
 }

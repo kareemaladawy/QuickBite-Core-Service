@@ -8,6 +8,10 @@ import { BranchNotFoundError } from "../errors";
 import { createBranch, findBranchById, findNearbyBranches, listBranchesByRestaurantId, updateBranchDetails, updateBranchStatus } from "../repository/branch.repo";
 import { TOKENS } from "../../../lib/di/tokens";
 import { MemberBranchCacheService } from "../../rbac/service/member-branch-cache.service";
+import { NearbyBranchRow } from "../types";
+import { db } from "../../../lib/knex/knex";
+import { insertOutboxEvent } from "../../../lib/events/outbox.repo";
+import { CoreEventType } from "../../../lib/events/event-types";
 
 @injectable()
 export class BranchService {
@@ -24,6 +28,7 @@ export class BranchService {
             countryCode: data.countryCode,
             currency: data.currency,
             deliveryRadius: data.deliveryRadius,
+            deliveryFee: data.deliveryFee,
             lat: data.lat,
             long: data.long,
             opensAt: data.opensAt,
@@ -47,25 +52,58 @@ export class BranchService {
     }
 
     updateBranchDetails: any = async (branchId: number, data: UpdateBranchDetailsDTO): Promise<void> => {
-        await updateBranchDetails(branchId, {
-            label: data.label,
-            addressText: data.addressText,
-            currency: data.currency,
-            deliveryRadius: data.deliveryRadius,
-            opensAt: data.opensAt,
-            closesAt: data.closesAt,
-            acceptsOrders: data.acceptsOrders,
-        });
+        const transaction = await db.transaction();
+
+        try {
+            await updateBranchDetails(branchId, {
+                label: data.label,
+                addressText: data.addressText,
+                currency: data.currency,
+                deliveryRadius: data.deliveryRadius,
+                deliveryFee: data.deliveryFee,
+                opensAt: data.opensAt,
+                closesAt: data.closesAt,
+                acceptsOrders: data.acceptsOrders,
+            }, transaction);
+
+            await insertOutboxEvent(transaction, {
+                aggregateType: "branch",
+                aggregateId: branchId,
+                eventType: data.acceptsOrders === false ? CoreEventType.BRANCH_DEACTIVATED : CoreEventType.BRANCH_UPDATED,
+                payload: { branchId },
+            });
+
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
     }
 
     updateBranchStatus: any = async (branchId: number, data: UpdateBranchStatusDTO): Promise<void> => {
-        await updateBranchStatus(branchId, {
-            isActive: data.isActive,
-            commissionPercentage: data.commissionPercentage
-        });
+        const transaction = await db.transaction();
+
+        try {
+            await updateBranchStatus(branchId, {
+                isActive: data.isActive,
+                commissionPercentage: data.commissionPercentage
+            }, transaction);
+
+            await insertOutboxEvent(transaction, {
+                aggregateType: "branch",
+                aggregateId: branchId,
+                eventType: data.isActive === false ? CoreEventType.BRANCH_DEACTIVATED : CoreEventType.BRANCH_UPDATED,
+                payload: { branchId },
+            });
+
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
     }
 
-    findNearbyBranches: any = async (lat: number, long: number): Promise<Branch[]> => {
+    findNearbyBranches: any = async (lat: number, long: number): Promise<NearbyBranchRow[]> => {
         const branches = await findNearbyBranches(lat, long);
 
         return branches;

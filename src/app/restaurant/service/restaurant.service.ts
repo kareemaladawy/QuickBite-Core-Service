@@ -10,6 +10,9 @@ import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
 import { ICacheProvider } from "../../../pkg/utils/cache/cache.interface";
 import { buildPaginationResult, FilterParams, PaginationParams } from "../../../lib/http/pagination/cursor-pagination";
+import { db } from "../../../lib/knex/knex";
+import { insertOutboxEvent } from "../../../lib/events/outbox.repo";
+import { CoreEventType } from "../../../lib/events/event-types";
 
 // mirrors the key withCache() derives for GET /api/v1/restaurants (no query params, so it's a single fixed key)
 const RESTAURANTS_LIST_CACHE_KEYS = ["GET:/api/v1/restaurants", "GET:/api/v1/restaurants/"];
@@ -54,13 +57,51 @@ export class RestaurantService {
     }
 
     updateRestaurantStatus = async (id: number, status: RestaurantStatus): Promise<void> => {
-        await updateRestaurantStatus(id, status);
+        const restaurant = await findRestaurantById(id);
+
+        if (!restaurant) {
+            throw RestaurantNotFoundError;
+        }
+
+        const transaction = await db.transaction();
+
+        try {
+            await updateRestaurantStatus(id, status, transaction);
+
+            if (status === RestaurantStatus.SUSPENDED) {
+                await insertOutboxEvent(transaction, {
+                    aggregateType: "restaurant",
+                    aggregateId: id,
+                    eventType: CoreEventType.RESTAURANT_SUSPENDED,
+                    payload: { restaurantId: id },
+                });
+            }
+
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
 
         await this.invalidateRestaurantsListCache();
     }
 
     updateRestaurant = async (id: number, data: UpdateRestaurantDto): Promise<void> => {
-        await updateRestaurant(id, data);
+        const restaurant = await findRestaurantById(id);
+
+        if (!restaurant) {
+            throw RestaurantNotFoundError;
+        }
+
+        const transaction = await db.transaction();
+
+        try {
+            await updateRestaurant(id, data, transaction);
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
 
         await this.invalidateRestaurantsListCache();
     }

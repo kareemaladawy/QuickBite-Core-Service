@@ -1,3 +1,4 @@
+import { Knex } from "knex";
 import { db } from "../../../lib/knex/knex";
 import { ProductBranch } from "../entity/product-branch.entity";
 
@@ -21,8 +22,8 @@ function toEntity(row: any): ProductBranch {
     });
 }
 
-export async function updateBranchDetails(branchId: number, productId: number, data: { price?: number, stock?: number, isAvailable?: boolean }): Promise<ProductBranch> {
-    const [row] = await db("product_branch")
+export async function updateBranchDetails(branchId: number, productId: number, data: { price?: number, stock?: number, isAvailable?: boolean }, transaction: Knex = db): Promise<ProductBranch> {
+    const [row] = await transaction("product_branch")
         .where("branch_id", branchId)
         .where("product_id", productId)
         .update({

@@ -38,8 +38,8 @@ export async function findCategoriesByRestaurant(restaurantId: number): Promise<
     return rows.map(toEntity);
 }
 
-export async function createCategory(restaurantId: number, name: string, conn: Knex = db): Promise<ProductCategory> {
-    const [row] = await conn("product_categories").insert({
+export async function createCategory(restaurantId: number, name: string, transaction: Knex = db): Promise<ProductCategory> {
+    const [row] = await transaction("product_categories").insert({
         restaurant_id: restaurantId,
         name,
     }).returning(CATEGORY_COLUMNS);

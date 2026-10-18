@@ -3,6 +3,7 @@ import { Branch } from "../entity/branch.entity";
 import { db } from "../../../lib/knex/knex";
 import { RestaurantStatus } from "../../restaurant/enums";
 import { UpdateBranchDetailsDTO, UpdateBranchStatusDTO } from "../dto/branch.dto";
+import { NearbyBranchRow } from "../types";
 
 const branchColumns = [
     "id",
@@ -62,6 +63,7 @@ export async function createBranch(data: Partial<Branch>, transaction: Knex = db
         country_code: data.countryCode,
         delivery_radius: data.deliveryRadius,
         commission_percentage: data.commissionPercentage,
+        delivery_fee: data.deliveryFee,
         created_at: now,
         updated_at: now,
     }).returning(branchColumns);
@@ -90,14 +92,27 @@ export async function updateBranchDetails(branchId: number, data: UpdateBranchDe
             closes_at: data.closesAt,
             accepts_orders: data.acceptsOrders,
             delivery_radius: data.deliveryRadius,
+            delivery_fee: data.deliveryFee,
             updated_at: new Date(),
         });
 }
 
-export async function findNearbyBranches(lat: number, long: number): Promise<Branch[]> {
-    const result = await db.raw(`
+interface NearbyBranchQueryRow {
+    label: string;
+    address_text: string;
+    opens_at: string;
+    closes_at: string;
+    accepts_orders: boolean;
+    country_code: Branch["countryCode"];
+    currency: Branch["currency"];
+    restaurant_name: string;
+    restaurant_logo_url: string;
+}
+
+export async function findNearbyBranches(lat: number, long: number): Promise<NearbyBranchRow[]> {
+    const result = await db.raw<{ rows: NearbyBranchQueryRow[] }>(`
         SELECT b.label, b.address_text, b.opens_at, b.closes_at, b.accepts_orders, b.country_code, b.currency,
-        r.name as restaurant_name, r.logo_url as restaurant_logo_url 
+        r.name as restaurant_name, r.logo_url as restaurant_logo_url
         FROM branches b join restaurants r on b.restaurant_id = r.id
         WHERE b.is_active = true AND b.accepts_orders = true AND r.status = ?
         AND ST_DWithin(b.location, ST_MakePoint(?::float, ?::float), b.delivery_radius*1000)
@@ -107,7 +122,7 @@ export async function findNearbyBranches(lat: number, long: number): Promise<Bra
         lat
     ]);
 
-    return result.rows.map((row: any) => {
+    return result.rows.map((row): NearbyBranchRow => {
         return {
             lable: row.label,
             restaurantName: row.restaurant_name,

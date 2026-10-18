@@ -33,6 +33,11 @@ export class CreateBranchDTO {
     @IsOptional()
     @IsNumber()
     commissionPercentage?: number
+
+    @IsOptional()
+    @IsInt({ message: 'Delivery fee must be an integer (minor units)' })
+    @Min(0)
+    deliveryFee?: number
 }
 
 export class UpdateBranchDetailsDTO {
@@ -64,6 +69,11 @@ export class UpdateBranchDetailsDTO {
     @IsString({ message: 'Closing hours must be a string' })
     @IsOptional()
     closesAt?: string;
+
+    @IsOptional()
+    @IsInt({ message: 'Delivery fee must be an integer (minor units)' })
+    @Min(0)
+    deliveryFee?: number;
 }
 
 export class UpdateBranchStatusDTO {
