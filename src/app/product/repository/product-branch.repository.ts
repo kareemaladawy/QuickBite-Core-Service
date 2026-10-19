@@ -22,6 +22,48 @@ function toEntity(row: any): ProductBranch {
     });
 }
 
+export interface ReserveStockItemInput {
+    productId: number;
+    quantity: number;
+}
+
+export interface ReserveStockFailure {
+    productId: number;
+    requested: number;
+    available: number;
+}
+
+// Decrements each item's stock in one trx, only where stock >= requested (underflow guard).
+// Returns the items that couldn't be reserved; caller rolls back the trx if this is non-empty.
+export async function reserveStock(branchId: number, items: ReserveStockItemInput[], transaction: Knex): Promise<ReserveStockFailure[]> {
+    const failures: ReserveStockFailure[] = [];
+
+    for (const item of items) {
+        const [row] = await transaction("product_branch")
+            .where("branch_id", branchId)
+            .where("product_id", item.productId)
+            .where("stock", ">=", item.quantity)
+            .update({ stock: transaction.raw("stock - ?", [item.quantity]) })
+            .returning(["product_id", "stock"]);
+
+        if (!row) {
+            const current = await transaction("product_branch")
+                .where("branch_id", branchId)
+                .where("product_id", item.productId)
+                .select("stock")
+                .first();
+
+            failures.push({
+                productId: item.productId,
+                requested: item.quantity,
+                available: current?.stock ?? 0,
+            });
+        }
+    }
+
+    return failures;
+}
+
 export async function updateBranchDetails(branchId: number, productId: number, data: { price?: number, stock?: number, isAvailable?: boolean }, transaction: Knex = db): Promise<ProductBranch> {
     const [row] = await transaction("product_branch")
         .where("branch_id", branchId)

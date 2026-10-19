@@ -92,6 +92,42 @@ export async function findProductsByBranch(branchId: number) {
     }));
 }
 
+export interface BranchProductDetailRow {
+    productId: number;
+    name: string;
+    imageUrl: string;
+    price: number;
+    stock: number;
+    isAvailable: boolean;
+}
+
+export async function findProductsByBranchAndIds(branchId: number, productIds: number[]): Promise<BranchProductDetailRow[]> {
+    if (productIds.length === 0) return [];
+
+    const rows = await db("products as p")
+        .join("product_branch as pb", "p.id", "pb.product_id")
+        .where("pb.branch_id", branchId)
+        .whereIn("p.id", productIds)
+        .whereNull("p.deleted_at")
+        .select(
+            "p.id",
+            "p.name",
+            "p.image_url",
+            "pb.price",
+            "pb.stock",
+            "pb.is_available",
+        );
+
+    return rows.map((row: any): BranchProductDetailRow => ({
+        productId: row.id,
+        name: row.name,
+        imageUrl: row.image_url,
+        price: row.price,
+        stock: row.stock,
+        isAvailable: row.is_available,
+    }));
+}
+
 export async function updateProduct(id: number, data: Record<string, any>, transaction: Knex = db): Promise<Product> {
     const [row] = await transaction("products").where("id", id).update({
         name: data.name,

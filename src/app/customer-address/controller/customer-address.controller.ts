@@ -22,6 +22,30 @@ export class CustomerAddressController {
         }
     }
 
+    findCustomerAddressInternal: any = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const address = await this.customerAddressService.findCustomerAddressById(Number(req.params.id));
+            const addressText = [address.street, address.building, address.apartmentNumber]
+                .filter(Boolean)
+                .join(", ") || `${address.city}, ${address.country}`;
+
+            sendSuccess(res, {
+                id: address.id,
+                userId: address.userId,
+                lat: address.lat,
+                lng: address.long,
+                addressText,
+                city: address.city,
+                country: address.country,
+                building: address.building,
+                apartmentNumber: address.apartmentNumber,
+                label: address.label,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     createCustomerAddress: any = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const validated = await validateBody(CreateCustomerAddressDto, req.body);

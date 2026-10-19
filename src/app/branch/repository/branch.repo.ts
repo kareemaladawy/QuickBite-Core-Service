@@ -149,6 +149,44 @@ export async function findBranchById(id: number): Promise<Branch | undefined> {
     return row ? toEntity(row) : undefined;
 }
 
+export interface BranchWithRestaurantStatusRow {
+    id: number;
+    restaurant_id: number;
+    restaurant_status: string;
+    accepts_orders: boolean;
+    is_active: boolean;
+    delivery_fee: number;
+    commission_percentage: number | null;
+    currency: string;
+    lat: number;
+    long: number;
+    label: string;
+    address_text: string;
+    country_code: string;
+}
+
+export async function findBranchWithRestaurantStatusById(id: number): Promise<BranchWithRestaurantStatusRow | undefined> {
+    return db("branches as b")
+        .join("restaurants as r", "r.id", "b.restaurant_id")
+        .where("b.id", id)
+        .select(
+            "b.id",
+            "b.restaurant_id",
+            "r.status as restaurant_status",
+            "b.accepts_orders",
+            "b.is_active",
+            "b.delivery_fee",
+            "b.commission_percentage",
+            "b.currency",
+            "b.lat",
+            "b.long",
+            "b.label",
+            "b.address_text",
+            "b.country_code",
+        )
+        .first();
+}
+
 export async function branchExistsById(id: number): Promise<boolean> {
     const result = await db.raw(`select exists (select 1 from branches where id = ?) as "exists"`, [
         id,

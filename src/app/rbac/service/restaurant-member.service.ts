@@ -13,7 +13,7 @@ import { RestaurantMember } from "../entity/restaurant-member.entity";
 import { MemberRole, MemberStatus } from "../enums";
 import { CannotCreateOwnerError, MemberNotFoundError, RoleNotFoundError } from "../errors";
 import { countBranchesByIdsAndRestaurant, setMemberBranches } from "../repository/member-branch.repo";
-import { getRolePermissions } from "../repository/permission.repo";
+import { getPermissionsDetailsByRoleName, getRolePermissions } from "../repository/permission.repo";
 import { createRestaurantMember, deleteRestaurantMember, findMembersByRestaurantId, findRestaurantMemberById, updateRestaurantMember } from "../repository/restaurant-member.repo";
 import { findRoleIdByName } from "../repository/role.repo";
 import { NoSuitableRoleFound } from "../../auth/errors";
@@ -182,5 +182,10 @@ export class RestaurantMemberService {
         } catch (error) {
             throw error;
         }
+    }
+
+    // "resource:action" strings — what order-service's RBAC read-through cache expects.
+    getRolePermissionNames = async (roleName: string): Promise<string[]> => {
+        return await getPermissionsDetailsByRoleName(roleName);
     }
 }

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { BranchService } from "../service/branch.service";
 import { SystemRole } from "../../user/enums";
 import { CreateBranchDTO, UpdateBranchDetailsDTO, UpdateBranchStatusDTO } from "../dto/branch.dto";
-import { BranchResponseDTO, NearbyBranchResponseDTO } from "../dto/branch.response.dto";
+import { BranchResponseDTO, InternalBranchResponseDTO, NearbyBranchResponseDTO } from "../dto/branch.response.dto";
 import { validateBody } from "../../../lib/validation/validate";
 import { UnauthorizedError } from "../errors";
 import { inject, injectable } from "tsyringe";
@@ -34,6 +34,18 @@ export class BranchController {
             );
 
             sendSuccess(res, BranchResponseDTO.from(branch));
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    findBranchInternal = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const row = await this.branchService.findBranchWithRestaurantStatusById(
+                Number(req.params.branchId)
+            );
+
+            sendSuccess(res, InternalBranchResponseDTO.from(row));
         } catch (error) {
             next(error);
         }

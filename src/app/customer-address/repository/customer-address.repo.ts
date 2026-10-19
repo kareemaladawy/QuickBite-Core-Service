@@ -44,6 +44,12 @@ export async function listUserCustomerAddresses(userId: number): Promise<Custome
     return addresses.map(toEntity);
 }
 
+export async function findCustomerAddressById(id: number): Promise<CustomerAddress | undefined> {
+    const row = await db("customer_addresses").where("id", id).select(customerAddressColumns).first();
+
+    return row ? toEntity(row) : undefined;
+}
+
 export async function createCustomerAddress(userId: number, data: any): Promise<CustomerAddress> {
     const [address] = await db("customer_addresses").insert({
         user_id: userId,

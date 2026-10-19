@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { healthRouter } from "./app/health/routes.js";
 import { authRouter } from "./app/auth/routes.js";
-import { userRouter } from "./app/user/routes.js";
-import { customerAddressRouter } from "./app/customer-address/routes.js";
+import { userRouter, agentInternalRouter } from "./app/user/routes.js";
+import { customerAddressRouter, customerAddressInternalRouter } from "./app/customer-address/routes.js";
 import { restaurantRouter } from "./app/restaurant/routes.js";
 import { branchRouter } from "./app/branch/routes.js";
 import { productRouter } from "./app/product/routes.js";
@@ -18,3 +18,5 @@ routes.use('/restaurants', restaurantRouter);
 routes.use('/', productRouter);
 routes.use('/', branchRouter);
 routes.use('/', restaurantMemberRouter);
+routes.use('/', customerAddressInternalRouter);
+routes.use('/', agentInternalRouter);

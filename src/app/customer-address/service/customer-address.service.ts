@@ -2,9 +2,11 @@ import { injectable } from "tsyringe";
 import {
     createCustomerAddress,
     deleteCustomerAddress,
+    findCustomerAddressById,
     listUserCustomerAddresses,
     updateCustomerAddress
 } from "../repository/customer-address.repo";
+import { CustomerAddressNotFoundError } from "../errors";
 
 @injectable()
 export class CustomerAddressService {
@@ -12,6 +14,16 @@ export class CustomerAddressService {
         const addresses = await listUserCustomerAddresses(userId);
 
         return addresses;
+    }
+
+    findCustomerAddressById: any = async (id: number) => {
+        const address = await findCustomerAddressById(id);
+
+        if (!address) {
+            throw CustomerAddressNotFoundError;
+        }
+
+        return address;
     }
 
     createCustomerAddress: any = async (userId: number, addressData: any) => {

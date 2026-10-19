@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../../lib/auth/middleware/guard";
 import { rbac, requireBranchAccess, requireRestaurantMember } from "../../lib/auth/middleware/rbac";
+import { requireInternalApiKey } from "../../lib/auth/middleware/api-key";
 import { container } from "../../lib/di/container";
 import { TOKENS } from "../../lib/di/tokens";
 import { BranchController } from "./controller/branch.controller";
@@ -10,6 +11,12 @@ import { toMs } from "../../pkg/utils/time";
 export const branchRouter = Router();
 
 const branchController = container.resolve<BranchController>(TOKENS.BranchController);
+
+branchRouter.get(
+    '/internal/branches/:branchId',
+    requireInternalApiKey,
+    branchController.findBranchInternal
+);
 
 branchRouter.get(
     '/branches/nearby',

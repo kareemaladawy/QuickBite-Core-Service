@@ -20,6 +20,16 @@ export class UserController {
         }
     }
 
+    findAgentInternal: any = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const agent = await this.userService.getAgentById(Number(req.params.id));
+
+            sendSuccess(res, agent);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     updateMe: any = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const validated = await validateBody(UpdateProfileDTO, req.body);

@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional, IsInt, Min, IsBoolean } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsInt, Min, IsBoolean, ArrayMinSize, ValidateNested } from "class-validator";
+import { Type } from "class-transformer";
 
 export class CreateProductDTO {
     @IsString()
@@ -50,4 +51,21 @@ export class UpdateProductDTO {
     @IsOptional()
     @IsBoolean()
     isAvailable?: boolean;
+}
+
+export class ReserveStockItemDTO {
+    @IsInt()
+    @Min(1)
+    productId!: number;
+
+    @IsInt()
+    @Min(1)
+    quantity!: number;
+}
+
+export class ReserveStockRequestDTO {
+    @ValidateNested({ each: true })
+    @Type(() => ReserveStockItemDTO)
+    @ArrayMinSize(1)
+    items!: ReserveStockItemDTO[];
 }

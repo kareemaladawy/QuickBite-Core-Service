@@ -104,4 +104,15 @@ export class RestaurantMemberController {
             next(error);
         }
     }
+
+    getRolePermissionsInternal = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const roleName = String(req.query.role ?? "");
+            const permissions = await this.restaurantMemberService.getRolePermissionNames(roleName);
+
+            sendSuccess(res, { role: roleName, permissions });
+        } catch (error) {
+            next(error);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../../lib/auth/middleware/guard";
 import { rbac, requireRestaurantMember } from "../../lib/auth/middleware/rbac";
+import { requireInternalApiKey } from "../../lib/auth/middleware/api-key";
 import { RestaurantMemberController } from "./controller/restaurant-member.controller";
 import { TOKENS } from "../../lib/di/tokens";
 import { container } from "../../lib/di/container";
@@ -8,6 +9,12 @@ import { container } from "../../lib/di/container";
 export const restaurantMemberRouter = Router();
 
 const restaurantMemberController = container.resolve<RestaurantMemberController>(TOKENS.RestaurantMemberController);
+
+restaurantMemberRouter.get(
+    '/internal/rbac/permissions',
+    requireInternalApiKey,
+    restaurantMemberController.getRolePermissionsInternal
+);
 
 restaurantMemberRouter.get(
     '/roles/:roleName/permissions',

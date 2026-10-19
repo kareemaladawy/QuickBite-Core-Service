@@ -33,6 +33,7 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
     if (operational) {
         return res.status(statusCode ?? 400).json({
             error: message,
+            ...(err.details !== undefined ? { details: err.details } : {}),
         });
     }
 

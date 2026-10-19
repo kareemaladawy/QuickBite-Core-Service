@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { validateBody } from "../../../lib/validation/validate";
 import { SystemRole } from "../../user/enums";
-import { CreateProductDTO, UpdateProductDTO } from "../dto/product.dto";
+import { CreateProductDTO, ReserveStockRequestDTO, UpdateProductDTO } from "../dto/product.dto";
 import { ProductService } from "../service/product.service";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
@@ -54,6 +54,36 @@ export class ProductController {
             const results = await this.productService.findByBranch(Number(req.params.branchId));
 
             sendSuccess(res, results);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    findByBranchAndIdsInternal = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const branchId = Number(req.params.branchId);
+            const idsParam = String(req.query.ids ?? "");
+            const productIds = idsParam
+                .split(",")
+                .map((id) => Number(id.trim()))
+                .filter((id) => !Number.isNaN(id));
+
+            const products = await this.productService.findByBranchAndIds(branchId, productIds);
+
+            sendSuccess(res, products);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    reserveStockInternal = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const branchId = Number(req.params.branchId);
+            const validated = await validateBody(ReserveStockRequestDTO, req.body);
+
+            await this.productService.reserveStock(branchId, validated.items);
+
+            sendSuccess(res, { message: "Stock reserved" });
         } catch (error) {
             next(error);
         }

@@ -5,7 +5,7 @@ import { findRestaurantMemberWithRoleName } from "../../rbac/repository/restaura
 import { CreateBranchDTO, UpdateBranchDetailsDTO, UpdateBranchStatusDTO } from "../dto/branch.dto";
 import { Branch } from "../entity/branch.entity";
 import { BranchNotFoundError } from "../errors";
-import { createBranch, findBranchById, findNearbyBranches, listBranchesByRestaurantId, updateBranchDetails, updateBranchStatus } from "../repository/branch.repo";
+import { createBranch, findBranchById, findBranchWithRestaurantStatusById, findNearbyBranches, listBranchesByRestaurantId, updateBranchDetails, updateBranchStatus, BranchWithRestaurantStatusRow } from "../repository/branch.repo";
 import { TOKENS } from "../../../lib/di/tokens";
 import { MemberBranchCacheService } from "../../rbac/service/member-branch-cache.service";
 import { NearbyBranchRow } from "../types";
@@ -123,5 +123,15 @@ export class BranchService {
         }
 
         return branch;
+    }
+
+    findBranchWithRestaurantStatusById: any = async (id: number): Promise<BranchWithRestaurantStatusRow> => {
+        const row = await findBranchWithRestaurantStatusById(id);
+
+        if (!row) {
+            throw BranchNotFoundError;
+        }
+
+        return row;
     }
 }

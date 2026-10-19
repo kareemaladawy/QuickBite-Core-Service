@@ -42,6 +42,20 @@ export class UserService {
         }
     }
 
+    getAgentById: any = async (id: number) => {
+        const user = await findUserById(id);
+
+        if (!user) {
+            throw UserNotFoundError;
+        }
+
+        return {
+            id: user.id,
+            name: user.name,
+            phone: user.phone,
+        };
+    }
+
     updateUserById: any = async (id: number, data: Object) => {
         const user = await findUserById(id);
 
