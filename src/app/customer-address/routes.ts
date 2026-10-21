@@ -19,7 +19,7 @@ customerAddressInternalRouter.get(
     customerAddressController.findCustomerAddressInternal
 );
 
-customerAddressRouter.get("/", authenticate, customerAddressController.listUserCustomerAddresses);
-customerAddressRouter.post("/", authenticate, customerAddressController.createCustomerAddress);
-customerAddressRouter.patch("/:id", authenticate, customerAddressController.updateCustomerAddress);
-customerAddressRouter.delete("/:id", authenticate, customerAddressController.deleteCustomerAddress);
+customerAddressRouter.get("/customer-addresses", authenticate, customerAddressController.listUserCustomerAddresses);
+customerAddressRouter.post("/customer-addresses", authenticate, customerAddressController.createCustomerAddress);
+customerAddressRouter.patch("/customer-addresses/:id", authenticate, customerAddressController.updateCustomerAddress);
+customerAddressRouter.delete("/customer-addresses/:id", authenticate, customerAddressController.deleteCustomerAddress);

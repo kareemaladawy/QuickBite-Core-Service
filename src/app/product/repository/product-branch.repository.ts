@@ -64,6 +64,33 @@ export async function reserveStock(branchId: number, items: ReserveStockItemInpu
     return failures;
 }
 
+export interface ReleaseStockFailure {
+    productId: number;
+}
+
+// Increments each item's stock back in one trx — undoes a prior reserveStock() call
+// (e.g. order-service releasing a reservation when it fails to persist the order). No
+// underflow guard needed since this only adds stock back. Returns items whose
+// product_branch row wasn't found, which shouldn't happen for a release referencing an
+// earlier successful reservation; caller rolls back the trx if this is non-empty.
+export async function releaseStock(branchId: number, items: ReserveStockItemInput[], transaction: Knex): Promise<ReleaseStockFailure[]> {
+    const failures: ReleaseStockFailure[] = [];
+
+    for (const item of items) {
+        const [row] = await transaction("product_branch")
+            .where("branch_id", branchId)
+            .where("product_id", item.productId)
+            .update({ stock: transaction.raw("stock + ?", [item.quantity]) })
+            .returning(["product_id", "stock"]);
+
+        if (!row) {
+            failures.push({ productId: item.productId });
+        }
+    }
+
+    return failures;
+}
+
 export async function updateBranchDetails(branchId: number, productId: number, data: { price?: number, stock?: number, isAvailable?: boolean }, transaction: Knex = db): Promise<ProductBranch> {
     const [row] = await transaction("product_branch")
         .where("branch_id", branchId)

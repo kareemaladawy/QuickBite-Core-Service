@@ -1,11 +1,11 @@
 import { RestaurantNotFoundError } from "../../restaurant/errors";
 import { findRestaurantById } from "../../restaurant/repository/restaurant.repo";
-import { insufficientStockError, ProductNotFoundError } from "../errors";
+import { insufficientStockError, ProductNotFoundError, releaseStockFailedError } from "../errors";
 import { SystemRole } from "../../user/enums";
 import { CreateProductDTO, UpdateProductDTO } from "../dto/product.dto";
 import { createProduct, findProductById, findProductsByBranch, findProductsByBranchAndIds, findProductsByRestaurant, updateProduct } from "../repository/product.repository";
 import { findCategoryByName, findCategoriesByRestaurant, createCategory } from "../repository/category.repository";
-import { reserveStock, ReserveStockItemInput, updateBranchDetails } from "../repository/product-branch.repository";
+import { releaseStock, reserveStock, ReserveStockItemInput, updateBranchDetails } from "../repository/product-branch.repository";
 import { db } from "../../../lib/knex/knex";
 import { injectable } from "tsyringe";
 import { insertOutboxEvent } from "../../../lib/events/outbox.repo";
@@ -74,6 +74,32 @@ export class ProductService {
 
             if (failures.length > 0) {
                 throw insufficientStockError(failures);
+            }
+
+            for (const item of items) {
+                await insertOutboxEvent(transaction, {
+                    aggregateType: "product_branch",
+                    aggregateId: item.productId,
+                    eventType: CoreEventType.PRODUCT_STOCK_CHANGED,
+                    payload: { productId: item.productId, branchId },
+                });
+            }
+
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
+    }
+
+    releaseStock = async (branchId: number, items: ReserveStockItemInput[]): Promise<void> => {
+        const transaction = await db.transaction();
+
+        try {
+            const failures = await releaseStock(branchId, items, transaction);
+
+            if (failures.length > 0) {
+                throw releaseStockFailedError(failures);
             }
 
             for (const item of items) {

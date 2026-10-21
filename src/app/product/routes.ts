@@ -25,6 +25,13 @@ productRouter.post(
     productController.reserveStockInternal
 );
 
+productRouter.post(
+    '/internal/branches/:branchId/release-stock',
+    requireInternalApiKey,
+    idempotency({ strict: true }),
+    productController.releaseStockInternal
+);
+
 // public endpoints
 productRouter.get('/restaurants/:restaurantId/categories', productController.findCategories);
 productRouter.get('/branches/:branchId/products', productController.findByBranch);

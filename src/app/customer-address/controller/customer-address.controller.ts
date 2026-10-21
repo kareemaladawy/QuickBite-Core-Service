@@ -30,10 +30,12 @@ export class CustomerAddressController {
                 .join(", ") || `${address.city}, ${address.country}`;
 
             sendSuccess(res, {
-                id: address.id,
-                userId: address.userId,
-                lat: address.lat,
-                lng: address.long,
+                // bigint columns come back from pg as strings; coerce since this feeds
+                // a cross-service contract (order-service's core-client).
+                id: Number(address.id),
+                userId: Number(address.userId),
+                lat: Number(address.lat),
+                lng: Number(address.long),
                 addressText,
                 city: address.city,
                 country: address.country,

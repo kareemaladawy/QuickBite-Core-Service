@@ -50,7 +50,9 @@ export class UserService {
         }
 
         return {
-            id: user.id,
+            // bigint columns come back from pg as strings; coerce since this feeds a
+            // cross-service contract (order-service's core-client).
+            id: Number(user.id),
             name: user.name,
             phone: user.phone,
         };

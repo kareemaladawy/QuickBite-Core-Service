@@ -67,7 +67,7 @@ export class AuthService {
                     throw RestaurantDataRequiredError;
                 }
 
-                await this.restaurantService.createWithOwner(
+                restaurant = await this.restaurantService.createWithOwner(
                     user.id,
                     data.restaurant,
                     transaction
@@ -78,9 +78,8 @@ export class AuthService {
 
             if (data.role === SystemRole.RESTAURANT_USER) {
                 await this.restaurantService.invalidateRestaurantsListCache();
+                restaurantMemberInfo = await this.generateRestaurantMemberInfoPayload(user);
             }
-
-            restaurantMemberInfo = await this.generateRestaurantMemberInfoPayload(user);
         } catch (error) {
             await transaction.rollback();
             throw error;

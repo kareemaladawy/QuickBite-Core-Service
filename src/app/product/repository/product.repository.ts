@@ -119,7 +119,9 @@ export async function findProductsByBranchAndIds(branchId: number, productIds: n
         );
 
     return rows.map((row: any): BranchProductDetailRow => ({
-        productId: row.id,
+        // bigint columns come back from pg as strings; coerce since this feeds a
+        // cross-service contract (order-service's core-client) that expects numbers.
+        productId: Number(row.id),
         name: row.name,
         imageUrl: row.image_url,
         price: row.price,

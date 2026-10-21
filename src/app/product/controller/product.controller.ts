@@ -89,6 +89,19 @@ export class ProductController {
         }
     }
 
+    releaseStockInternal = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const branchId = Number(req.params.branchId);
+            const validated = await validateBody(ReserveStockRequestDTO, req.body);
+
+            await this.productService.releaseStock(branchId, validated.items);
+
+            sendSuccess(res, { message: "Stock released" });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     findById = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const product = await this.productService.findById(Number(req.params.id));

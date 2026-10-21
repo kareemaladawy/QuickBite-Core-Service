@@ -44,7 +44,7 @@ export class RestaurantService {
         return restaurant;
     }
 
-    createWithOwner: any = async (userId: number, data: RegisterRestaurantDTO, transaction: Knex) => {
+    createWithOwner: any = async (userId: number, data: RegisterRestaurantDTO, transaction: Knex): Promise<Restaurant> => {
         const restaurant = await createRestaurant(new Restaurant({
             ownerId: userId,
             name: data.name,
@@ -54,6 +54,8 @@ export class RestaurantService {
         }), transaction);
 
         await this.restaurantMemberService.createOwnerMember(restaurant.id, userId, transaction);
+
+        return restaurant;
     }
 
     updateRestaurantStatus = async (id: number, status: RestaurantStatus): Promise<void> => {

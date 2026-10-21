@@ -91,9 +91,11 @@ export class InternalBranchResponseDTO {
 
     static from(row: BranchWithRestaurantStatusRow): InternalBranchResponseDTO {
         const dto = new InternalBranchResponseDTO();
-        dto.id = row.id;
+        dto.id = Number(row.id);
         dto.region = row.country_code.toLowerCase();
-        dto.restaurantId = row.restaurant_id;
+        // bigint columns come back from pg as strings; this DTO is a cross-service
+        // contract that promises numbers, so coerce explicitly.
+        dto.restaurantId = Number(row.restaurant_id);
         dto.restaurantStatus = row.restaurant_status as RestaurantStatus;
         dto.acceptOrders = row.accepts_orders;
         dto.isActive = row.is_active;
