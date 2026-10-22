@@ -33,10 +33,20 @@ export interface ReserveStockFailure {
     available: number;
 }
 
+// New stock/availability for an item after a reserveStock()/releaseStock() write —
+// carried back so callers can publish a PRODUCT_STOCK_CHANGED event without a second
+// read of the row they just wrote.
+export interface StockUpdateResult {
+    productId: number;
+    stock: number;
+    isAvailable: boolean;
+}
+
 // Decrements each item's stock in one trx, only where stock >= requested (underflow guard).
 // Returns the items that couldn't be reserved; caller rolls back the trx if this is non-empty.
-export async function reserveStock(branchId: number, items: ReserveStockItemInput[], transaction: Knex): Promise<ReserveStockFailure[]> {
+export async function reserveStock(branchId: number, items: ReserveStockItemInput[], transaction: Knex): Promise<{ failures: ReserveStockFailure[], updated: StockUpdateResult[] }> {
     const failures: ReserveStockFailure[] = [];
+    const updated: StockUpdateResult[] = [];
 
     for (const item of items) {
         const [row] = await transaction("product_branch")
@@ -44,7 +54,7 @@ export async function reserveStock(branchId: number, items: ReserveStockItemInpu
             .where("product_id", item.productId)
             .where("stock", ">=", item.quantity)
             .update({ stock: transaction.raw("stock - ?", [item.quantity]) })
-            .returning(["product_id", "stock"]);
+            .returning(["product_id", "stock", "is_available"]);
 
         if (!row) {
             const current = await transaction("product_branch")
@@ -58,10 +68,12 @@ export async function reserveStock(branchId: number, items: ReserveStockItemInpu
                 requested: item.quantity,
                 available: current?.stock ?? 0,
             });
+        } else {
+            updated.push({ productId: row.product_id, stock: row.stock, isAvailable: row.is_available });
         }
     }
 
-    return failures;
+    return { failures, updated };
 }
 
 export interface ReleaseStockFailure {
@@ -73,22 +85,25 @@ export interface ReleaseStockFailure {
 // underflow guard needed since this only adds stock back. Returns items whose
 // product_branch row wasn't found, which shouldn't happen for a release referencing an
 // earlier successful reservation; caller rolls back the trx if this is non-empty.
-export async function releaseStock(branchId: number, items: ReserveStockItemInput[], transaction: Knex): Promise<ReleaseStockFailure[]> {
+export async function releaseStock(branchId: number, items: ReserveStockItemInput[], transaction: Knex): Promise<{ failures: ReleaseStockFailure[], updated: StockUpdateResult[] }> {
     const failures: ReleaseStockFailure[] = [];
+    const updated: StockUpdateResult[] = [];
 
     for (const item of items) {
         const [row] = await transaction("product_branch")
             .where("branch_id", branchId)
             .where("product_id", item.productId)
             .update({ stock: transaction.raw("stock + ?", [item.quantity]) })
-            .returning(["product_id", "stock"]);
+            .returning(["product_id", "stock", "is_available"]);
 
         if (!row) {
             failures.push({ productId: item.productId });
+        } else {
+            updated.push({ productId: row.product_id, stock: row.stock, isAvailable: row.is_available });
         }
     }
 
-    return failures;
+    return { failures, updated };
 }
 
 export async function updateBranchDetails(branchId: number, productId: number, data: { price?: number, stock?: number, isAvailable?: boolean }, transaction: Knex = db): Promise<ProductBranch> {

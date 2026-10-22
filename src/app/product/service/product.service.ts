@@ -70,18 +70,18 @@ export class ProductService {
         const transaction = await db.transaction();
 
         try {
-            const failures = await reserveStock(branchId, items, transaction);
+            const { failures, updated } = await reserveStock(branchId, items, transaction);
 
             if (failures.length > 0) {
                 throw insufficientStockError(failures);
             }
 
-            for (const item of items) {
+            for (const item of updated) {
                 await insertOutboxEvent(transaction, {
                     aggregateType: "product_branch",
                     aggregateId: item.productId,
                     eventType: CoreEventType.PRODUCT_STOCK_CHANGED,
-                    payload: { productId: item.productId, branchId },
+                    payload: { productId: item.productId, branchId, stock: item.stock, isAvailable: item.isAvailable },
                 });
             }
 
@@ -96,18 +96,18 @@ export class ProductService {
         const transaction = await db.transaction();
 
         try {
-            const failures = await releaseStock(branchId, items, transaction);
+            const { failures, updated } = await releaseStock(branchId, items, transaction);
 
             if (failures.length > 0) {
                 throw releaseStockFailedError(failures);
             }
 
-            for (const item of items) {
+            for (const item of updated) {
                 await insertOutboxEvent(transaction, {
                     aggregateType: "product_branch",
                     aggregateId: item.productId,
                     eventType: CoreEventType.PRODUCT_STOCK_CHANGED,
-                    payload: { productId: item.productId, branchId },
+                    payload: { productId: item.productId, branchId, stock: item.stock, isAvailable: item.isAvailable },
                 });
             }
 
@@ -167,7 +167,7 @@ export class ProductService {
                         aggregateType: "product_branch",
                         aggregateId: productId,
                         eventType: CoreEventType.PRODUCT_STOCK_CHANGED,
-                        payload: { productId, branchId, stock: data.stock },
+                        payload: { productId, branchId, stock: branchDetails.stock, isAvailable: branchDetails.isAvailable },
                     });
                 }
 
