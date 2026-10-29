@@ -15,6 +15,7 @@ const branchController = container.resolve<BranchController>(TOKENS.BranchContro
 branchRouter.get(
     '/internal/branches/:branchId',
     requireInternalApiKey,
+    withCache(toMs(1, 'h')),
     branchController.findBranchInternal
 );
 

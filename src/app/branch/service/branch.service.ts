@@ -5,19 +5,30 @@ import { findRestaurantMemberWithRoleName } from "../../rbac/repository/restaura
 import { CreateBranchDTO, UpdateBranchDetailsDTO, UpdateBranchStatusDTO } from "../dto/branch.dto";
 import { Branch } from "../entity/branch.entity";
 import { BranchNotFoundError } from "../errors";
-import { createBranch, findBranchById, findBranchWithRestaurantStatusById, findNearbyBranches, listBranchesByRestaurantId, updateBranchDetails, updateBranchStatus, BranchWithRestaurantStatusRow } from "../repository/branch.repo";
+import { createBranch, findBranchById, findBranchWithRestaurantStatusById, findNearbyBranches, listBranchesByRestaurantId, updateBranchDetails, updateBranchStatus } from "../repository/branch.repo";
+import { BranchWithRestaurantStatusRow } from "../types";
 import { TOKENS } from "../../../lib/di/tokens";
 import { MemberBranchCacheService } from "../../rbac/service/member-branch-cache.service";
 import { NearbyBranchRow } from "../types";
 import { db } from "../../../lib/knex/knex";
 import { insertOutboxEvent } from "../../../lib/events/outbox.repo";
 import { CoreEventType } from "../../../lib/events/event-types";
+import { ICacheProvider } from "../../../pkg/cache/cache.interface";
+
+// mirrors the key withCache() derives for GET /api/v1/internal/branches/:branchId (order-service's
+// internal branch client is the only caller, and it relies on us invalidating this on update)
+const internalBranchCacheKey = (branchId: number): string => `GET:/api/v1/internal/branches/${branchId}`;
 
 @injectable()
 export class BranchService {
     constructor(
-        @inject(TOKENS.MemberBranchCacheService) private readonly memberBranchCacheService: MemberBranchCacheService
+        @inject(TOKENS.MemberBranchCacheService) private readonly memberBranchCacheService: MemberBranchCacheService,
+        @inject(TOKENS.CacheProvider) private readonly cacheProvider: ICacheProvider
     ) { }
+
+    invalidateInternalBranchCache = async (branchId: number): Promise<void> => {
+        await this.cacheProvider.del(internalBranchCacheKey(branchId));
+    }
 
     createBranch: any = async (restaurantId: number, ownerId: number, data: CreateBranchDTO): Promise<Branch> => {
         const now = new Date();
@@ -78,6 +89,8 @@ export class BranchService {
             await transaction.rollback();
             throw error;
         }
+
+        await this.invalidateInternalBranchCache(branchId);
     }
 
     updateBranchStatus: any = async (branchId: number, data: UpdateBranchStatusDTO): Promise<void> => {
@@ -101,6 +114,8 @@ export class BranchService {
             await transaction.rollback();
             throw error;
         }
+
+        await this.invalidateInternalBranchCache(branchId);
     }
 
     findNearbyBranches: any = async (lat: number, long: number): Promise<NearbyBranchRow[]> => {

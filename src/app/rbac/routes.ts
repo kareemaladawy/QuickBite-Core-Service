@@ -5,6 +5,8 @@ import { requireInternalApiKey } from "../../lib/auth/middleware/api-key";
 import { RestaurantMemberController } from "./controller/restaurant-member.controller";
 import { TOKENS } from "../../lib/di/tokens";
 import { container } from "../../lib/di/container";
+import { withCache } from "../../lib/cache/middleware/withCache";
+import { toMs } from "../../pkg/utils/time";
 
 export const restaurantMemberRouter = Router();
 
@@ -13,6 +15,7 @@ const restaurantMemberController = container.resolve<RestaurantMemberController>
 restaurantMemberRouter.get(
     '/internal/rbac/permissions',
     requireInternalApiKey,
+    withCache(toMs(2, 'h')),
     restaurantMemberController.getRolePermissionsInternal
 );
 

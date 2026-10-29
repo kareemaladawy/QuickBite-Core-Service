@@ -10,6 +10,12 @@ import { CoreEventType } from "../lib/events/event-types";
 //
 // Any future migration that adds/removes rows in permissions or role_permission must
 // insert a matching RBAC_PERMISSIONS_CHANGED outbox event in the same transaction.
+//
+// If permission catalog changes ever move to a runtime admin endpoint instead of
+// migrations, that endpoint must also call
+// RestaurantMemberService.invalidateInternalRolePermissionsCache(roleName) for every
+// affected role — that clears core-service's own withCache layer on
+// GET /internal/rbac/permissions, which the outbox event above does not touch.
 export async function up(knex: Knex): Promise<void> {
     await insertOutboxEvent(knex, {
         aggregateType: "rbac",

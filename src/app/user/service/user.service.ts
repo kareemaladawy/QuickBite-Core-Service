@@ -3,7 +3,7 @@ import { UserAlreadyExistsError, UserNotFoundError } from "../errors";
 import { createUser, findUserById, updateUserProfile, userExistsByEmailOrPhone } from "../repository/user.repo";
 import { hashPassword } from "../../auth/utils";
 import { User } from "../entity/user.entity";
-import { CreateUserData } from "../dto/user.dto";
+import { CreateUserData } from "../types";
 import { injectable } from "tsyringe";
 
 @injectable()

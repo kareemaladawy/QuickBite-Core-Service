@@ -2,7 +2,7 @@ import { Branch } from "../entity/branch.entity";
 import { CountryCode, Currency } from "../enums";
 import { NearbyBranchRow } from "../types";
 import { RestaurantStatus } from "../../restaurant/enums";
-import { BranchWithRestaurantStatusRow } from "../repository/branch.repo";
+import { BranchWithRestaurantStatusRow } from "../types";
 
 export class BranchResponseDTO {
     id!: number;

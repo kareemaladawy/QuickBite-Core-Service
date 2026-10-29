@@ -1,6 +1,7 @@
 import { Knex } from "knex";
 import { db } from "../../../lib/knex/knex";
 import { Product } from "../entity/product.entity";
+import { BranchProductDetailRow } from "../types";
 
 const PRODUCT_COLUMNS = [
     'id',
@@ -90,15 +91,6 @@ export async function findProductsByBranch(branchId: number) {
         stock: row.stock,
         isAvailable: row.is_available,
     }));
-}
-
-export interface BranchProductDetailRow {
-    productId: number;
-    name: string;
-    imageUrl: string;
-    price: number;
-    stock: number;
-    isAvailable: boolean;
 }
 
 export async function findProductsByBranchAndIds(branchId: number, productIds: number[]): Promise<BranchProductDetailRow[]> {

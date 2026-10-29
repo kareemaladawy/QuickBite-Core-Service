@@ -23,6 +23,14 @@ import { TOKENS } from "../../../lib/di/tokens";
 import { MemberBranchCacheService } from "./member-branch-cache.service";
 import { MemberInvitationEmail } from "../templates/member-invitation.template";
 import { IEmailProvider } from "../../../pkg/email/email.interface";
+import { ICacheProvider } from "../../../pkg/cache/cache.interface";
+
+// mirrors the key withCache() derives for GET /api/v1/internal/rbac/permissions?role=<roleName> —
+// any future mutation of the permissions/role_permission catalog (today only seeded via
+// migrations, see 20261017090300_publish_rbac_permissions_changed.ts) must invalidate this
+// alongside the RBAC_PERMISSIONS_CHANGED outbox event order-service listens for.
+const internalRolePermissionsCacheKey = (roleName: string): string =>
+    `GET:/api/v1/internal/rbac/permissions?role=${roleName}`;
 
 @injectable()
 export class RestaurantMemberService {
@@ -30,7 +38,12 @@ export class RestaurantMemberService {
         @inject(TOKENS.UserService) private readonly userService: UserService,
         @inject(TOKENS.EmailProvider) private readonly emailProvider: IEmailProvider,
         @inject(TOKENS.MemberBranchCacheService) private readonly memberBranchCacheService: MemberBranchCacheService,
+        @inject(TOKENS.CacheProvider) private readonly cacheProvider: ICacheProvider,
     ) { }
+
+    invalidateInternalRolePermissionsCache = async (roleName: string): Promise<void> => {
+        await this.cacheProvider.del(internalRolePermissionsCacheKey(roleName));
+    }
 
     listMembers = async (restaurantId: number) => {
         const members = await findMembersByRestaurantId(restaurantId);
