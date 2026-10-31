@@ -4,6 +4,7 @@ import { createUser, findUserById, updateUserProfile, userExistsByEmailOrPhone }
 import { hashPassword } from "../../auth/utils";
 import { User } from "../entity/user.entity";
 import { CreateUserData } from "../types";
+import { SystemRole } from "../enums";
 import { injectable } from "tsyringe";
 
 @injectable()
@@ -45,7 +46,10 @@ export class UserService {
     getAgentById: any = async (id: number) => {
         const user = await findUserById(id);
 
-        if (!user) {
+        // Same not-found error whether the id doesn't exist or belongs to a non-agent
+        // user — this is an internal lookup keyed on "is this id a delivery agent",
+        // not a generic user fetch, so it shouldn't leak which case it is.
+        if (!user || user.systemRole !== SystemRole.DELIVERY_AGENT) {
             throw UserNotFoundError;
         }
 
