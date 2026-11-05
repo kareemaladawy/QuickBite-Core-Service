@@ -98,6 +98,7 @@ export async function updateBranchDetails(branchId: number, data: UpdateBranchDe
 }
 
 interface NearbyBranchQueryRow {
+    id: number;
     label: string;
     address_text: string;
     opens_at: string;
@@ -111,7 +112,7 @@ interface NearbyBranchQueryRow {
 
 export async function findNearbyBranches(lat: number, long: number): Promise<NearbyBranchRow[]> {
     const result = await db.raw<{ rows: NearbyBranchQueryRow[] }>(`
-        SELECT b.label, b.address_text, b.opens_at, b.closes_at, b.accepts_orders, b.country_code, b.currency,
+        SELECT b.id, b.label, b.address_text, b.opens_at, b.closes_at, b.accepts_orders, b.country_code, b.currency,
         r.name as restaurant_name, r.logo_url as restaurant_logo_url
         FROM branches b join restaurants r on b.restaurant_id = r.id
         WHERE b.is_active = true AND b.accepts_orders = true AND r.status = ?
@@ -124,6 +125,7 @@ export async function findNearbyBranches(lat: number, long: number): Promise<Nea
 
     return result.rows.map((row): NearbyBranchRow => {
         return {
+            id: row.id,
             lable: row.label,
             restaurantName: row.restaurant_name,
             restaurantLogoUrl: row.restaurant_logo_url,

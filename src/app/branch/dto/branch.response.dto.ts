@@ -47,6 +47,7 @@ export class BranchResponseDTO {
 }
 
 export class NearbyBranchResponseDTO {
+    id!: number;
     label!: string;
     restaurantName!: string;
     restaurantLogoUrl!: string;
@@ -59,6 +60,7 @@ export class NearbyBranchResponseDTO {
 
     static from(row: NearbyBranchRow): NearbyBranchResponseDTO {
         const dto = new NearbyBranchResponseDTO();
+        dto.id = row.id;
         dto.label = row.lable;
         dto.restaurantName = row.restaurantName;
         dto.restaurantLogoUrl = row.restaurantLogoUrl;

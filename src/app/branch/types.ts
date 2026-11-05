@@ -2,6 +2,7 @@ import { CountryCode, Currency } from "./enums";
 
 // Shape returned by branch.repo.ts#findNearbyBranches — a join projection, not a Branch entity.
 export interface NearbyBranchRow {
+    id: number;
     lable: string;
     restaurantName: string;
     restaurantLogoUrl: string;

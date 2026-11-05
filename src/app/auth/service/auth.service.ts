@@ -12,6 +12,7 @@ import { RestaurantService } from "../../restaurant/service/restaurant.service";
 import { db } from "../../../lib/knex/knex";
 import { Restaurant } from "../../restaurant/entity/restaurant.entity";
 import { activateRestaurantMember, findRestaurantMemberWithRoleName } from "../../rbac/repository/restaurant-member.repo";
+import { findMemberBranchIdsByUserId } from "../../rbac/repository/member-branch.repo";
 import { UserService } from "../../user/service/user.service";
 import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
@@ -34,9 +35,12 @@ export class AuthService {
         }
 
         if (memberData) {
+            const branchIds = await findMemberBranchIdsByUserId(Number(user.id));
+
             return {
                 restaurantId: memberData.member.restaurantId,
                 restaurantRole: memberData.roleName,
+                branchIds,
             }
         }
 
