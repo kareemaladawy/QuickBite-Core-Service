@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { RestaurantService } from "../service/restaurant.service";
 import { validateBody } from "../../../lib/validation/validate";
 import { UpdateRestaurantDto, UpdateRestaurantStatusDto } from "../dto/restaurant.dto";
+import { InternalRestaurantResponseDTO } from "../dto/restaurant.response.dto";
 import { SystemRole } from "../../user/enums";
 import { InvalidRestaurantIdError, UnauthorizedError } from "../errors";
 import { inject, injectable } from "tsyringe";
@@ -31,6 +32,17 @@ export class RestaurantController {
             const restaurant = await this.restaurantService.findRestaurantById(restaurantId);
 
             sendSuccess(res, restaurant);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    findRestaurantInternal = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const restaurantId = Number(req.params.id);
+            const restaurant = await this.restaurantService.findRestaurantById(restaurantId);
+
+            sendSuccess(res, InternalRestaurantResponseDTO.from(restaurant));
         } catch (error) {
             next(error);
         }

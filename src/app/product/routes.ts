@@ -6,6 +6,7 @@ import { idempotency } from "../../lib/idempotency/middleware/idempotency";
 import { container } from "../../lib/di/container";
 import { TOKENS } from "../../lib/di/tokens";
 import { ProductController } from "./controller/product.controller";
+import { withCache } from "../../lib/cache/middleware/withCache";
 
 export const productRouter = Router();
 
@@ -33,14 +34,15 @@ productRouter.post(
 );
 
 // public endpoints
-productRouter.get('/restaurants/:restaurantId/categories', productController.findCategories);
-productRouter.get('/branches/:branchId/products', productController.findByBranch);
-productRouter.get('/products/:id', productController.findById);
+productRouter.get('/restaurants/:restaurantId/categories', withCache(), productController.findCategories);
+productRouter.get('/branches/:branchId/products', withCache(), productController.findByBranch);
+productRouter.get('/products/:id', withCache(), productController.findById);
 
 productRouter.get(
     '/restaurants/:restaurantId/products',
     authenticate,
     requireRestaurantMember('restaurantId'),
+    withCache(),
     productController.findByRestaurant
 );
 

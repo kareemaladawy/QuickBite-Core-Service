@@ -57,6 +57,7 @@ export async function insertOutboxEvent(transaction: Knex, data: OutboxEventInpu
 export async function claimUndispatchedEvents(transaction: Knex, limit: number): Promise<OutboxEventRow[]> {
     const rows = await transaction("events_outbox")
         .whereNull("dispatched_at")
+        .whereNull("dead_lettered_at")
         .orderBy("id", "asc")
         .limit(limit)
         .forUpdate()
@@ -80,7 +81,10 @@ export interface OutboxFailure {
 }
 
 // One UPDATE ... FROM (VALUES ...) for the whole batch instead of one query per failed event.
-export async function markEventsFailed(transaction: Knex, failures: OutboxFailure[]): Promise<void> {
+// A row whose attempts (after this increment) reach maxAttempts is dead-lettered so a
+// permanently-broken event (bad payload, unknown routing key) stops being reclaimed every
+// tick and can't starve healthy events behind it in the id-ordered claim query.
+export async function markEventsFailed(transaction: Knex, failures: OutboxFailure[], maxAttempts: number): Promise<void> {
     if (failures.length === 0) return;
 
     const values = failures.map((f) => `(?::bigint, ?::text)`).join(", ");
@@ -90,10 +94,11 @@ export async function markEventsFailed(transaction: Knex, failures: OutboxFailur
         `
         UPDATE events_outbox eo
         SET attempts = eo.attempts + 1,
-            last_error = v.last_error
+            last_error = v.last_error,
+            dead_lettered_at = CASE WHEN eo.attempts + 1 >= ? THEN now() ELSE eo.dead_lettered_at END
         FROM (VALUES ${values}) AS v(id, last_error)
         WHERE eo.id = v.id
         `,
-        bindings
+        [maxAttempts, ...bindings]
     );
 }

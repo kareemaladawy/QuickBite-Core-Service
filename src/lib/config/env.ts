@@ -20,10 +20,10 @@ const schema = z.object({
     BCRYPT_SALT: z.string().default("10"),
     ACCESS_SECRET: z.string(),
     REFRESH_SECRET: z.string(),
-    ACCESS_EXPIRES_IN: z.string().default("3600"),
+    ACCESS_EXPIRES_IN: z.string().default("10800"),
     REFRESH_EXPIRES_IN: z.string().default("60480"),
     NODE_ENV: z.enum(['local', 'development', 'production']),
-    ACCESS_EXPIRES_IN_MS: z.string().default("3600000"),
+    ACCESS_EXPIRES_IN_MS: z.string().default("10800000"),
     CORS_ORIGINS: z.string().default("http://localhost:3000"),
 
     MAILJET_FROM_NAME: z.string(),
@@ -37,6 +37,7 @@ const schema = z.object({
     RABBITMQ_CORE_EVENTS_EXCHANGE: z.string().default("core.events"),
     OUTBOX_DRAIN_CRON: z.string().default("*/10 * * * * *"),
     OUTBOX_BATCH_SIZE: z.string().default("50"),
+    OUTBOX_MAX_ATTEMPTS: z.string().default("10"),
 })
 
 const parsed = schema.parse(process.env);
@@ -86,5 +87,6 @@ export const env = {
     outbox: {
         drainCron: parsed.OUTBOX_DRAIN_CRON,
         batchSize: Number(parsed.OUTBOX_BATCH_SIZE),
+        maxAttempts: Number(parsed.OUTBOX_MAX_ATTEMPTS),
     },
 }

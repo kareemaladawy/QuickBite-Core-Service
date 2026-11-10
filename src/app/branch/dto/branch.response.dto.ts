@@ -102,7 +102,8 @@ export class InternalBranchResponseDTO {
         dto.acceptOrders = row.accepts_orders;
         dto.isActive = row.is_active;
         dto.deliveryFee = row.delivery_fee;
-        dto.commissionBps = Number(row.commission_percentage ?? 0);
+        // commission_percentage is a true percentage (e.g. 8.00 for 8%); bps = percentage * 100.
+        dto.commissionBps = Math.round(Number(row.commission_percentage ?? 0) * 100);
         dto.currency = row.currency as Currency;
         dto.lat = Number(row.lat);
         dto.lng = Number(row.long);

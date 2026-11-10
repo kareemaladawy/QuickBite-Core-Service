@@ -1,14 +1,27 @@
 import { Router } from "express";
 import { authenticate } from "../../lib/auth/middleware/guard";
 import { rbac, requireRestaurantMember } from "../../lib/auth/middleware/rbac";
+import { requireInternalApiKey } from "../../lib/auth/middleware/api-key";
 import { container } from "../../lib/di/container";
 import { TOKENS } from "../../lib/di/tokens";
 import { RestaurantController } from "./controller/restaurant.controller";
 import { withCache } from "../../lib/cache/middleware/withCache";
+import { toMs } from "../../pkg/utils/time";
 
 export const restaurantRouter = Router();
 
+// mounted at root (not under /restaurants) so the internal path matches the
+// documented cross-service contract: GET /api/v1/internal/restaurants/:id
+export const restaurantInternalRouter = Router();
+
 const restaurantController = container.resolve<RestaurantController>(TOKENS.RestaurantController);
+
+restaurantInternalRouter.get(
+    '/internal/restaurants/:id',
+    requireInternalApiKey,
+    withCache(toMs(1, 'h')),
+    restaurantController.findRestaurantInternal
+);
 
 restaurantRouter.get(
     '/',

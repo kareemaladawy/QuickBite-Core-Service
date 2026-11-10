@@ -25,7 +25,7 @@ async function drainOutbox(): Promise<void> {
             const message = (error as Error).message;
             logger.error("RabbitMQ unreachable, deferring batch", { error: message, count: events.length });
 
-            await markEventsFailed(transaction, events.map((event) => ({ id: event.id, error: message })));
+            await markEventsFailed(transaction, events.map((event) => ({ id: event.id, error: message })), env.outbox.maxAttempts);
             await transaction.commit();
             return;
         }
@@ -52,10 +52,21 @@ async function drainOutbox(): Promise<void> {
 
         // One bulk UPDATE per outcome instead of one query per event.
         await markEventsDispatched(transaction, dispatchedIds);
-        await markEventsFailed(transaction, failures);
+        await markEventsFailed(transaction, failures, env.outbox.maxAttempts);
+
+        const deadLettered = events.filter(
+            (event) => failures.some((f) => f.id === event.id) && event.attempts + 1 >= env.outbox.maxAttempts
+        );
+        if (deadLettered.length > 0) {
+            logger.error("Outbox events dead-lettered after exceeding max attempts", {
+                count: deadLettered.length,
+                eventIds: deadLettered.map((event) => event.eventId),
+                maxAttempts: env.outbox.maxAttempts,
+            });
+        }
 
         await transaction.commit();
-        logger.info("Outbox drained", { dispatched: dispatchedIds.length, failed: failures.length });
+        logger.info("Outbox drained", { dispatched: dispatchedIds.length, failed: failures.length, deadLettered: deadLettered.length });
     } catch (error) {
         await transaction.rollback();
         logger.error("Outbox drain failed", { error: (error as Error).message });

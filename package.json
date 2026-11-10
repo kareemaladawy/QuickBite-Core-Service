@@ -5,7 +5,12 @@
     "start": "node dist/server.js",
     "worker:dev": "tsx watch src/worker.ts",
     "worker": "node dist/worker.js",
-    "knex": "node --import tsx node_modules/knex/bin/cli.js --knexfile src/lib/knex/knexfile.ts"
+    "knex": "node --import tsx node_modules/knex/bin/cli.js --knexfile src/lib/knex/knexfile.ts",
+    "migrate": "npm run knex -- migrate:latest",
+    "migrate:rollback": "npm run knex -- migrate:rollback",
+    "migrate:status": "npm run knex -- migrate:status",
+    "migrate:make": "npm run knex -- migrate:make",
+    "test": "vitest run"
   },
   "dependencies": {
     "@types/cors": "^2.8.19",
@@ -41,6 +46,7 @@
     "eslint": "^10.11.0",
     "prettier": "^3.9.9",
     "tsx": "^4.23.15",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
   }
 }

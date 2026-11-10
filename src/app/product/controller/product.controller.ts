@@ -115,7 +115,7 @@ export class ProductController {
     update = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const data = await validateBody(UpdateProductDTO, req.body);
-            const branchId = req.query.branchId ? Number(req.query.branchId) : undefined;
+            const branchId = req.params.branchId ? Number(req.params.branchId) : undefined;
 
             await this.productService.update(
                 Number(req.params.id),
