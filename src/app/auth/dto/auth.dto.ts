@@ -2,6 +2,20 @@ import { IsEmail, IsString, IsStrongPassword, MinLength, MaxLength, IsEnum, isSt
 import { SystemRole } from "../../user/enums";
 import { Type } from "class-transformer";
 
+export class RegisterRestaurantDTO {
+    @IsString()
+    @MinLength(1)
+    name!: string;
+
+    @IsOptional()
+    @IsString()
+    logoURL?: string;
+
+    @IsString()
+    @MinLength(1)
+    primaryRegion!: string;
+}
+
 export class RegisterDTO {
     @IsString()
     @MinLength(1)
@@ -34,20 +48,6 @@ export class RegisterDTO {
     @Type(() => RegisterRestaurantDTO)
     @ValidateNested()
     restaurant?: RegisterRestaurantDTO;
-}
-
-export class RegisterRestaurantDTO {
-    @IsString()
-    @MinLength(1)
-    name!: string;
-
-    @IsOptional()
-    @IsString()
-    logoURL?: string;
-
-    @IsString()
-    @MinLength(1)
-    primaryRegion!: string;
 }
 
 export class LoginDTO {

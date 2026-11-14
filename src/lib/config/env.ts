@@ -2,7 +2,7 @@ import { config } from "dotenv";
 import path from "path";
 import { z } from "zod";
 
-config({ path: path.resolve(__dirname, '../../../.env') });
+config({ path: path.resolve(__dirname, '../../../.env'), quiet: true });
 
 const schema = z.object({
     PORT: z.string().default("3000"),
@@ -22,7 +22,7 @@ const schema = z.object({
     REFRESH_SECRET: z.string(),
     ACCESS_EXPIRES_IN: z.string().default("10800"),
     REFRESH_EXPIRES_IN: z.string().default("60480"),
-    NODE_ENV: z.enum(['local', 'development', 'production']),
+    NODE_ENV: z.enum(['local', 'development', 'production', 'test']),
     ACCESS_EXPIRES_IN_MS: z.string().default("10800000"),
     CORS_ORIGINS: z.string().default("http://localhost:3000"),
 

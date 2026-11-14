@@ -1,4 +1,5 @@
 .env
+.env.test
 workflow
 /node_modules
 /dist
