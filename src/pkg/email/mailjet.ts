@@ -1,5 +1,5 @@
 import Mailjet from "node-mailjet";
-import { IEmailProvider } from "./email.interface";
+import type { IEmailProvider } from "./email.interface";
 
 export interface MailjetEmailProviderConfig {
     fromName: string;

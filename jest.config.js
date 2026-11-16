@@ -22,5 +22,5 @@ module.exports = {
     },
     roots: ['<rootDir>/tests/unit'],
     testMatch: ['**/*.test.ts'],
-    setupFiles: ['<rootDir>/tests/unit/setup.env.ts'],
+    setupFiles: ['<rootDir>/tests/setup.env.ts'],
 }

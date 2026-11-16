@@ -12,7 +12,7 @@ import { inject, injectable } from "tsyringe";
 import { insertOutboxEvent } from "../../../lib/events/outbox.repo";
 import { CoreEventType } from "../../../lib/events/event-types";
 import { TOKENS } from "../../../lib/di/tokens";
-import { ICacheProvider } from "../../../pkg/cache/cache.interface";
+import type { ICacheProvider } from "../../../pkg/cache/cache.interface";
 import { Product } from "../entity/product.entity";
 import { toMs } from "../../../pkg/utils/time";
 

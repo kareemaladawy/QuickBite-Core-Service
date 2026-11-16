@@ -12,7 +12,7 @@ import { buildPaginationResult, FilterParams, PaginationParams } from "../../../
 import { db } from "../../../lib/knex/knex";
 import { insertOutboxEvent } from "../../../lib/events/outbox.repo";
 import { CoreEventType } from "../../../lib/events/event-types";
-import { ICacheProvider } from "../../../pkg/cache/cache.interface";
+import type { ICacheProvider } from "../../../pkg/cache/cache.interface";
 
 // mirrors the key withCache() derives for GET /api/v1/restaurants (no query params, so it's a single fixed key)
 const RESTAURANTS_LIST_CACHE_KEYS = ["GET:/api/v1/restaurants", "GET:/api/v1/restaurants/"];

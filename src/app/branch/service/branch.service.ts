@@ -13,7 +13,7 @@ import { NearbyBranchRow } from "../types";
 import { db } from "../../../lib/knex/knex";
 import { insertOutboxEvent } from "../../../lib/events/outbox.repo";
 import { CoreEventType } from "../../../lib/events/event-types";
-import { ICacheProvider } from "../../../pkg/cache/cache.interface";
+import type { ICacheProvider } from "../../../pkg/cache/cache.interface";
 
 // mirrors the key withCache() derives for GET /api/v1/internal/branches/:branchId (order-service's
 // internal branch client is the only caller, and it relies on us invalidating this on update)

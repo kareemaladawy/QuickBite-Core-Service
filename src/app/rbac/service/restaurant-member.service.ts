@@ -22,8 +22,8 @@ import { inject, injectable } from "tsyringe";
 import { TOKENS } from "../../../lib/di/tokens";
 import { MemberBranchCacheService } from "./member-branch-cache.service";
 import { MemberInvitationEmail } from "../templates/member-invitation.template";
-import { IEmailProvider } from "../../../pkg/email/email.interface";
-import { ICacheProvider } from "../../../pkg/cache/cache.interface";
+import type { IEmailProvider } from "../../../pkg/email/email.interface";
+import type { ICacheProvider } from "../../../pkg/cache/cache.interface";
 
 // mirrors the key withCache() derives for GET /api/v1/internal/rbac/permissions?role=<roleName> —
 // any future mutation of the permissions/role_permission catalog (today only seeded via
