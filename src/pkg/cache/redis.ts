@@ -38,4 +38,8 @@ export class RedisCacheProvider implements ICacheProvider {
     async del(key: string): Promise<void> {
         await this.client.del(key);
     }
+
+    async disconnect(): Promise<void> {
+        await this.client.quit();
+    }
 }

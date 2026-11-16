@@ -8,4 +8,8 @@ export default async function globalTeardown() {
     // destroy database connection
     const { db } = require("../../src/lib/knex/knex")
     await db.destroy()
+
+    // close redis connection
+    const { cacheProvider } = require("../../src/lib/cache/init")
+    await cacheProvider.disconnect()
 }
