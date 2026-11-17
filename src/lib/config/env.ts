@@ -33,7 +33,7 @@ const schema = z.object({
 
     INTERNAL_API_KEY: z.string(),
 
-    RABBITMQ_URL: z.string(),
+    RABBITMQ_URL: z.string().default(""),
     RABBITMQ_CORE_EVENTS_EXCHANGE: z.string().default("core.events"),
     OUTBOX_DRAIN_CRON: z.string().default("*/10 * * * * *"),
     OUTBOX_BATCH_SIZE: z.string().default("50"),
