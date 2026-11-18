@@ -7,6 +7,7 @@ import { restaurantRouter, restaurantInternalRouter } from "./app/restaurant/rou
 import { branchRouter } from "./app/branch/routes.js";
 import { productRouter } from "./app/product/routes.js";
 import { restaurantMemberRouter } from "./app/rbac/routes.js";
+import { mediaRouter } from "./app/media/routes.js";
 
 export const routes = Router();
 
@@ -18,6 +19,7 @@ routes.use('/', customerAddressRouter);
 routes.use('/', productRouter);
 routes.use('/', branchRouter);
 routes.use('/', restaurantMemberRouter);
+routes.use('/', mediaRouter);
 routes.use('/', customerAddressInternalRouter);
 routes.use('/', agentInternalRouter);
 routes.use('/', restaurantInternalRouter);

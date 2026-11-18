@@ -9,6 +9,7 @@ export const TOKENS = {
     MemberBranchCacheService: Symbol.for('MemberBranchCacheService'),
     RestaurantService: Symbol.for('RestaurantService'),
     UserService: Symbol.for('UserService'),
+    MediaService: Symbol.for('MediaService'),
 
     // Controllers
     AuthController: Symbol.for('AuthController'),
@@ -18,9 +19,15 @@ export const TOKENS = {
     RestaurantMemberController: Symbol.for('RestaurantMemberController'),
     RestaurantController: Symbol.for('RestaurantController'),
     UserController: Symbol.for('UserController'),
+    MediaController: Symbol.for('MediaController'),
 
     // lib/infrastructure
     Logger: Symbol.for('Logger'),
     CacheProvider: Symbol.for('CacheProvider'),
     EmailProvider: Symbol.for('EmailProvider'),
+    StorageProvider: Symbol.for('StorageProvider'),
+
+    // config
+    CdnUrl: Symbol.for('CdnUrl'),
+    S3MaxUploadSizeBytes: Symbol.for('S3MaxUploadSizeBytes'),
 };

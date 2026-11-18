@@ -33,6 +33,13 @@ const schema = z.object({
 
     INTERNAL_API_KEY: z.string(),
 
+    AWS_REGION: z.string(),
+    S3_BUCKET: z.string(),
+    AWS_ACCESS_KEY_ID: z.string(),
+    AWS_ACCESS_SECRET: z.string(),
+    S3_MAX_UPLOAD_SIZE_BYTES: z.string().default("10485760"),
+    CDN_URL: z.string(),
+
     RABBITMQ_URL: z.string().default(""),
     RABBITMQ_CORE_EVENTS_EXCHANGE: z.string().default("core.events"),
     OUTBOX_DRAIN_CRON: z.string().default("*/10 * * * * *"),
@@ -79,6 +86,16 @@ export const env = {
     },
     internal: {
         apiKey: parsed.INTERNAL_API_KEY,
+    },
+    aws: {
+        region: parsed.AWS_REGION,
+        s3Bucket: parsed.S3_BUCKET,
+        accessKeyId: parsed.AWS_ACCESS_KEY_ID,
+        accessSecret: parsed.AWS_ACCESS_SECRET,
+        s3MaxUploadSizeBytes: Number(parsed.S3_MAX_UPLOAD_SIZE_BYTES),
+    },
+    cdn: {
+        url: parsed.CDN_URL.replace(/\/+$/, ""),
     },
     rabbitmq: {
         url: parsed.RABBITMQ_URL,

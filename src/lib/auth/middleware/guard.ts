@@ -11,7 +11,6 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
 
     try {
         req.user = verifyAccessToken(accessToken);
-
     } catch (error) {
         return res.status(401).json({ error: NotAuthenticatedError.message });
     }

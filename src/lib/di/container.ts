@@ -17,8 +17,12 @@ import { ProductController } from '../../app/product/controller/product.controll
 import { RestaurantMemberController } from '../../app/rbac/controller/restaurant-member.controller';
 import { RestaurantController } from '../../app/restaurant/controller/restaurant.controller';
 import { UserController } from '../../app/user/controller/user.controller';
+import { MediaService } from '../../app/media/service/media.service';
+import { MediaController } from '../../app/media/controller/media.controller';
 import { cacheProvider } from '../cache/init';
 import { emailProvider } from '../email/init';
+import { storageProvider } from '../s3/init';
+import { env } from '../config/env';
 
 // Services
 container.registerSingleton(TOKENS.AuthService, AuthService);
@@ -30,6 +34,7 @@ container.registerSingleton(TOKENS.ProductService, ProductService);
 container.registerSingleton(TOKENS.CustomerAddressService, CustomerAddressService);
 container.registerSingleton(TOKENS.PermissionCacheService, PermissionCacheService);
 container.registerSingleton(TOKENS.MemberBranchCacheService, MemberBranchCacheService);
+container.registerSingleton(TOKENS.MediaService, MediaService);
 
 // Controllers
 container.registerSingleton(TOKENS.AuthController, AuthController);
@@ -39,6 +44,7 @@ container.registerSingleton(TOKENS.ProductController, ProductController);
 container.registerSingleton(TOKENS.RestaurantMemberController, RestaurantMemberController);
 container.registerSingleton(TOKENS.RestaurantController, RestaurantController);
 container.registerSingleton(TOKENS.UserController, UserController);
+container.registerSingleton(TOKENS.MediaController, MediaController);
 
 // lib/infrastructure
 container.registerSingleton(TOKENS.Logger, Logger);
@@ -46,5 +52,10 @@ container.registerSingleton(TOKENS.Logger, Logger);
 // used registerInstance here because we already have a singleton defined in lib/cache/init.ts
 container.registerInstance(TOKENS.CacheProvider, cacheProvider);
 container.registerInstance(TOKENS.EmailProvider, emailProvider);
+container.registerInstance(TOKENS.StorageProvider, storageProvider);
+
+// config
+container.registerInstance(TOKENS.CdnUrl, env.cdn.url);
+container.registerInstance(TOKENS.S3MaxUploadSizeBytes, env.aws.s3MaxUploadSizeBytes);
 
 export { container };

@@ -5,7 +5,7 @@ export interface NearbyBranchRow {
     id: number;
     lable: string;
     restaurantName: string;
-    restaurantLogoUrl: string;
+    restaurantLogoUrl: string | null;
     addressText: string;
     opensAt: string;
     closesAt: string;

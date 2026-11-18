@@ -7,10 +7,6 @@ export class RegisterRestaurantDTO {
     @MinLength(1)
     name!: string;
 
-    @IsOptional()
-    @IsString()
-    logoURL?: string;
-
     @IsString()
     @MinLength(1)
     primaryRegion!: string;

@@ -47,6 +47,12 @@ services:
       MAILJET_API_KEY: test
       MAILJET_API_SECRET: test
       INTERNAL_API_KEY: test
+      AWS_REGION: us-east-1
+      S3_BUCKET: quickbite-media-test
+      AWS_ACCESS_KEY_ID: test
+      AWS_ACCESS_SECRET: test
+      S3_MAX_UPLOAD_SIZE_BYTES: "10485760"
+      CDN_URL: https://cdn.quickbite.test
     depends_on:
       postgres:
         condition: service_healthy

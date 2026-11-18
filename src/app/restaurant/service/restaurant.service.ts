@@ -50,7 +50,6 @@ export class RestaurantService {
             name: data.name,
             primaryRegion: data.primaryRegion,
             status: RestaurantStatus.PENDING,
-            logoURL: data.logoURL,
         }), transaction);
 
         await this.restaurantMemberService.createOwnerMember(restaurant.id, userId, transaction);

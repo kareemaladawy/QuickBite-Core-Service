@@ -6,7 +6,7 @@ export class Restaurant {
     name: string;
     primaryRegion: string;
     status: RestaurantStatus;
-    logoURL: string;
+    logoURL: string | null;
     statusUpdatedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
@@ -16,7 +16,7 @@ export class Restaurant {
         this.name = data.name!;
         this.ownerId = data.ownerId!;
         this.primaryRegion = data.primaryRegion!;
-        this.logoURL = data.logoURL!;
+        this.logoURL = data.logoURL ?? null;
         this.status = data.status!;
         this.statusUpdatedAt = data.statusUpdatedAt!;
         this.createdAt = data.createdAt!;

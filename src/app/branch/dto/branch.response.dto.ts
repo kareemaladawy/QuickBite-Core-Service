@@ -50,7 +50,7 @@ export class NearbyBranchResponseDTO {
     id!: number;
     label!: string;
     restaurantName!: string;
-    restaurantLogoUrl!: string;
+    restaurantLogoUrl!: string | null;
     addressText!: string;
     opensAt!: string;
     closesAt!: string;

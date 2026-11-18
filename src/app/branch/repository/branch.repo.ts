@@ -107,7 +107,7 @@ interface NearbyBranchQueryRow {
     country_code: Branch["countryCode"];
     currency: Branch["currency"];
     restaurant_name: string;
-    restaurant_logo_url: string;
+    restaurant_logo_url: string | null;
 }
 
 export async function findNearbyBranches(lat: number, long: number): Promise<NearbyBranchRow[]> {
